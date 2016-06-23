@@ -1,6 +1,6 @@
 'use strict';
-
-var firebase = require("firebase");
+// Firebase and gcloud services
+var firebase = require("firebase"); 
 var gcloud = require('gcloud') ({
 	projectId: 'vision-recognition-1338',
 	keyFilename: 'keyfile.json'
@@ -20,3 +20,10 @@ var ref = db.ref("restricted_access/secret_document");
 ref.once("value", function(snapshot) {
   console.log(snapshot.val());
 });
+
+var fbAuth = firebase.auth(),
+	fbDatabase = firebase.database(),
+	fbStorage = firebase.storage(),
+	fbStorageRef = storage.ref();
+
+
