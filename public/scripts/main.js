@@ -1,10 +1,13 @@
 'use strict';
-// Firebase and gcloud services
+// Firebase,gcloud,exiftool,filesystem services
 var firebase = require("firebase"); 
+var exif = require('exiftool');
+var fs = require('fs');
 var gcloud = require('gcloud') ({
 	projectId: 'vision-recognition-1338',
 	keyFilename: 'keyfile.json'
 });
+
 
 var vision = gcloud.vision();
 
@@ -23,7 +26,42 @@ ref.once("value", function(snapshot) {
 
 var fbAuth = firebase.auth(),
 	fbDatabase = firebase.database(),
+	fbDatabaseRef = fbDatabase.ref(),
 	fbStorage = firebase.storage(),
 	fbStorageRef = storage.ref();
+
+//-------------------------Firebase Functions----------------------------//
+
+//Write image data
+function writeImageData(numOfPeople,imageName, imageData, imageURL) {
+
+	var imageData = { 
+		numOfPeople: numOfPeople,
+		imageName: imageName,
+		imageData: imageData,
+		imageURL: imageURL
+		};
+
+	//New key to write into firebase database
+	var newWriteKey = fbDatabaseRef.child('imageDatas').push().key;
+
+	//Update the database with the image data
+	var updates = {};
+	updates['imageDatas/' + newWriteKey] = imageData;
+
+	return fbDatabaseRef.update(updates);
+}
+
+//-------------------------Google Vision Functions----------------------------//
+function countPeople(image) {
+
+}
+
+//---------------------------Miscelleneous------------------------------//
+function getImageMetadata(image) {
+
+}
+
+
 
 
