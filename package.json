@@ -1,7 +1,7 @@
 {
   "name": "vision-recognition",
   "description": "google cloud vision project",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": true,
   "license": "Apache Version 2.0",
   "engines": {
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "express": "^4.14.0",
-    "gcloud" : "^0.32"
-    
+    "gcloud" : "^0.32",
+    "firebase": "3.0.3"
   }
 }

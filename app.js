@@ -16,12 +16,6 @@
 'use strict';
 
 var express = require('express');
-var gcloud = require('gcloud') ({
-	projectId: 'vision-recognition-1338',
-	keyFilename: 'keyfile.json'
-});
-
-var vision = gcloud.vision();
 
 var app = express();
 
@@ -30,8 +24,8 @@ var app = express();
 }); */
 
 app.use(express.static('public'));
-app.use(express.static('public/css'));
-
+app.use(express.static('public/styles'));
+app.use(express.static('public/scripts'));
 
 // Start the server
 var server = app.listen(process.env.PORT || '8080', function () {
