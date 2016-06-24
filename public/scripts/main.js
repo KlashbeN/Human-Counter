@@ -1,8 +1,7 @@
 'use strict';
-// Firebase,gcloud,exiftool,filesystem services
-var firebase = require("firebase"); 
-var exif = require('exiftool');
-var fs = require('fs');
+// Firebase,gcloud services
+
+var firebase = require("firebase");
 var gcloud = require('gcloud') ({
 	projectId: 'vision-recognition-1338',
 	keyFilename: 'keyfile.json'
@@ -25,10 +24,15 @@ ref.once("value", function(snapshot) {
 });
 
 var fbAuth = firebase.auth(),
-	fbDatabase = firebase.database(),
-	fbDatabaseRef = fbDatabase.ref(),
-	fbStorage = firebase.storage(),
-	fbStorageRef = storage.ref();
+	fbDatabaseRef = db.ref(),
+	image = 'demo.jpg';
+
+
+function main(image) {
+	countPeople(image, function(faces){
+		console.log('Found' + faces.length + 'face');
+	});
+}
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -52,16 +56,35 @@ function writeImageData(numOfPeople,imageName, imageData, imageURL) {
 	return fbDatabaseRef.update(updates);
 }
 
-//-------------------------Google Vision Functions----------------------------//
-function countPeople(image) {
+function retrieveImage() {
 
 }
+
+//-------------------------Google Vision Functions----------------------------//
+
+
+function countPeople(image,callback) {
+	vision.detectFaces(image, function(error,faces) {
+		if(error) {
+			callback(error); 
+		}
+		callback(null,faces);
+	});
+}
+
 
 //---------------------------Miscelleneous------------------------------//
 function getImageMetadata(image) {
 
 }
 
+function imageResize(image) { 
 
+return image;
+}
+exports.main = main;
 
+if(module == require.main) {
+	exports.main(image);
+}
 
