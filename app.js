@@ -13,19 +13,29 @@
 // limitations under the License.
 
 // [START app]
+
 'use strict';
 
 var express = require('express');
+var path = require('path');
 
 var app = express();
+var router = express.Router();
 
 /*app.get('/', function (req, res) {
   res.status(200).send('Hello, world!');
 }); */
 
-app.use(express.static('public'));
-app.use(express.static('public/styles'));
-app.use(express.static('public/scripts'));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine' , 'pug');
+
+app.get('/' , function(req, res) {
+	res.render('index');
+});
+// Basic 404 handler
+app.use(function (req, res) {
+  res.status(404).send('Not Found');
+});
 
 // Start the server
 var server = app.listen(process.env.PORT || '8080', function () {

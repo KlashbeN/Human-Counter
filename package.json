@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "express": "^4.14.0",
-    "gcloud" : "^0.32",
-    "firebase": "3.0.3"
+    "firebase": "3.0.3",
+    "gcloud": "^0.32",
+    "jade": "1.11.0",
+    "pug": "^2.0.0-beta3"
   }
 }

@@ -1,7 +1,10 @@
 'use strict';
-// Firebase,gcloud services
+// Firebase,gcloud,graphicsmagick,fs services
 
-var firebase = require("firebase");
+var firebase = require("firebase"),
+	fs = require('fs'),
+	gm = require('gm');
+
 var gcloud = require('gcloud') ({
 	projectId: 'vision-recognition-1338',
 	keyFilename: 'keyfile.json'
@@ -79,7 +82,9 @@ function getImageMetadata(image) {
 }
 
 function imageResize(image) { 
-
+	gm(image).resizeExact(640,480).write(image , function(err)) {
+		if(!err) console.log('done resizing');
+	}
 return image;
 }
 exports.main = main;
