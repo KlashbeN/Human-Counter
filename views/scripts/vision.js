@@ -15,8 +15,8 @@ var vision = gcloud.vision();
 
 // Initialize the app with a service account, granting admin privileges
 firebase.initializeApp({
-  databaseURL: "https://vision-recognition-1338.firebaseio.com/",
-  serviceAccount: "serviceAccountCredentials.json"
+  databaseURL: 'https://vision-recognition-1338.firebaseio.com/',
+  serviceAccount: 'serviceAccountCredentials.json'
 });
 
 // As an admin, the app has access to read and write all data, regardless of Security Rules
@@ -27,15 +27,10 @@ ref.once("value", function(snapshot) {
 });
 
 var fbAuth = firebase.auth(),
-	fbDatabaseRef = db.ref(),
-	image = 'demo.jpg';
+	fbDatabaseRef = db.ref();
 
+var numOfPeople = 0;
 
-function main(image) {
-	countPeople(image, function(faces){
-		console.log('Found' + faces.length + 'face');
-	});
-}
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -68,13 +63,14 @@ function retrieveImage() {
 
 function countPeople(image,callback) {
 	vision.detectFaces(image, function(error,faces) {
-		if(error) {
-			callback(error); 
-		}
-		callback(null,faces);
+		if(error) throw error;
+		callback(faces);
 	});
 }
 
+function getNumberOfPeople() {
+	return numOfPeople;
+}
 
 //---------------------------Miscelleneous------------------------------//
 function getImageMetadata(image) {
@@ -82,14 +78,23 @@ function getImageMetadata(image) {
 }
 
 function imageResize(image) { 
-	gm(image).resizeExact(640,480).write(image , function(err)) {
+	gm(image).resizeExact(640,480).write(image , function(err) {
 		if(!err) console.log('done resizing');
-	}
+	});
 return image;
 }
+
+function main(image) {
+	countPeople(image, function(faces){
+		console.log('Found' + faces.length + 'face');
+	});
+}
+
 exports.main = main;
 
+
 if(module == require.main) {
+	var image = process.argv[2];
 	exports.main(image);
 }
 
