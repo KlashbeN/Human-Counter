@@ -4,7 +4,7 @@ var vision = require('../views/scripts/vision.js');
 
 describe('vision' , function() {
 	it('getNumOfPeople() should return 0 if there is no humans present', function() { 
-		var vision = new Vision([]);
-		expect(vision.getNumOfPeople().to.equal(0));
+		var number = vision.getNumberOfPeople();
+		expect(number).to.equal(0);
 	});
 });
