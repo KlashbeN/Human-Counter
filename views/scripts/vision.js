@@ -103,6 +103,7 @@ function countPeople(image,callback) {
 
 //---------------------------Miscelleneous------------------------------//
 
+// -------- Moment Functions ---------- //
 function getDate() {
 	return moment().format('LL');
 }
@@ -118,6 +119,7 @@ function getTime() {
 function getNumberOfPeople() {
 	return numOfPeople;
 }
+
 
 function getImageMetadata(image) {
 
@@ -135,8 +137,8 @@ function main(image) {
 		console.log('Found' + faces.length + 'face');
 		numOfPeople = faces.length;
 	}); */
-	readData();
-	writeData('hello','world','now');
+	imageResize(image);
+	writeData('hello','world2121','now');
 	console.log('done');
 }
 
