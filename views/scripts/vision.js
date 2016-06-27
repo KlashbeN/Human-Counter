@@ -50,16 +50,14 @@ function writeImageData(numOfPeople,imageName, imageData, imageURL) {
 		imageURL: imageURL
 		};
 
-	//New key to write into firebase database
-	var newWriteKey = dbRef.child('imageDatas').push().key;
-
 	//Update the database with the image data
 	var updates = {};
-	updates['imageDatas/' + newWriteKey] = imageData; // Creates new branch called imageDatas
+	updates[getDay() + '/' + getTime()] = imageData; // Creates new branch called imageDatas
 
 	return dbRef.update(updates);
 }
-//Test
+//Test 
+
 function writeData(info1, info2, info3) { 
 	var data = { 
 		info1: info1,
@@ -70,10 +68,9 @@ function writeData(info1, info2, info3) {
 
 	var updates = {};
 	//updates[newDataKey] = data; // Creates new branch only with the newDataKey
-	updates[getDay() + '/' + getTime()] = data;
+	updates[getDay() + ' ' + getDate() + '/' + getTime()] = data;
 	return dbRef.update(updates);
 }
-
 
 //Test
 function readData() {
@@ -106,8 +103,12 @@ function countPeople(image,callback) {
 
 //---------------------------Miscelleneous------------------------------//
 
+function getDate() {
+	return moment().format('LL');
+}
+
 function getDay() {
-	return moment().date();
+	return moment().format('dddd');
 }
 
 function getTime() {
