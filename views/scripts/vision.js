@@ -12,7 +12,9 @@ var gcloud = require('gcloud') ({
 });
 
 
-var vision = gcloud.vision();
+var vision = gcloud.vision(),
+	gcs = gcloud.storage(),
+	bucket = gcs.bucket('vision-recognition-1338.appspot.com');
 
 // Initialize the app with a service account, granting admin privileges
 /*firebase.initializeApp({
@@ -35,6 +37,7 @@ var db = firebase.database();
 var fbAuth = firebase.auth(),
 	dbRef = db.ref('imageDatas'),
 	image = 'demo.jpg';
+
 
 var numOfPeople = 0;
 
@@ -87,7 +90,9 @@ function getImageData() {
 	
 
 function retrieveImage() {
-
+	bucket.file(image).download({
+		destination: 'test1.jpg'
+	},function(err) {});
 }
 
 //-------------------------Google Vision Functions----------------------------//
@@ -133,12 +138,13 @@ return image;
 }
 
 function main(image) {
-	countPeople(image, function(faces){
+	/*countPeople(image, function(faces){
 		console.log('Found' + faces.length + 'face');
 		numOfPeople = faces.length;
-	}); 
-	writeData('hello','world','numOfPeople');
-	readData();
+	}); */
+	//writeData('hello','world','numOfPeople');
+	//readData();
+	retrieveImage();
 	console.log('done');
 }
 

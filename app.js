@@ -22,12 +22,9 @@ var path = require('path');
 var app = express();
 var router = express.Router();
 
-/*app.get('/', function (req, res) {
-  res.status(200).send('Hello, world!');
-}); */
 
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine' , 'pug');
+app.set('view engine' , 'ejs');
 
 app.get('/' , function(req, res) {
 	res.render('index');
