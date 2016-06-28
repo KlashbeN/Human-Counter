@@ -10,11 +10,11 @@ var gcloud = require('gcloud') ({
 	projectId: 'vision-recognition-1338',
 	keyFilename: 'keyfile.json'
 });
-
+var CLOUD_BUCKET = 'vision-recognition-1338.appspot.com';
 
 var vision = gcloud.vision(),
 	gcs = gcloud.storage(),
-	bucket = gcs.bucket('vision-recognition-1338.appspot.com');
+	bucket = gcs.bucket(CLOUD_BUCKET);
 
 // Initialize the app with a service account, granting admin privileges
 /*firebase.initializeApp({
@@ -88,11 +88,22 @@ function getImageData() {
 	dbRef.on();
 }
 	
+function uploadImage(image) {
+	bucket.upload(image , function(err,file) {
+		if(!err) { 
+			console.log('successful upload')
+	}
+});
+}	
 
 function retrieveImage() {
 	bucket.file(image).download({
 		destination: 'test1.jpg'
 	},function(err) {});
+}
+
+function getPublicUrl(image){
+	return 'https://storage.googleapis.com/' + CLOUD_BUCKET + '/' + image;
 }
 
 //-------------------------Google Vision Functions----------------------------//
@@ -144,11 +155,16 @@ function main(image) {
 	}); */
 	//writeData('hello','world','numOfPeople');
 	//readData();
-	retrieveImage();
+	//retrieveImage();
+	uploadImage(image);
 	console.log('done');
 }
 
 exports.main = main;
+
+module.exports = {
+	getPublicUrl: getPublicUrl
+};
 
 if(module == require.main) {
 	exports.main(image);
