@@ -133,12 +133,12 @@ return image;
 }
 
 function main(image) {
-	/*countPeople(image, function(faces){
+	countPeople(image, function(faces){
 		console.log('Found' + faces.length + 'face');
 		numOfPeople = faces.length;
-	}); */
-	imageResize(image);
-	writeData('hello','world2121','now');
+	}); 
+	writeData('hello','world','numOfPeople');
+	readData();
 	console.log('done');
 }
 
