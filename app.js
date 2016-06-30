@@ -21,6 +21,7 @@ var path = require('path');
 
 var app = express();
 var router = express.Router();
+require('./views/scripts/vision.js')();
 
 
 app.set('views', path.join(__dirname, 'views'));
@@ -29,6 +30,7 @@ app.set('view engine' , 'ejs');
 app.get('/' , function(req, res) {
 	res.render('index');
 });
+
 // Basic 404 handler
 app.use(function (req, res) {
   res.status(404).send('Not Found');

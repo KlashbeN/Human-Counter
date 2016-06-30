@@ -1,15 +1,22 @@
 'use strict';
-// Firebase,gcloud,graphicsmagick,fs services
+// Firebase,gcloud,graphicsmagick,fs,ejs services
 
 var firebase = require("firebase"),
 	fs = require('fs'),
 	gm = require('gm'),
 	moment = require('moment');
+	
+var	ejs = require('ejs')
+  , read = fs.readFileSync
+  , join = require('path').join
+  , path = join(__dirname,'../', 'views' , '/index.ejs');
+
 
 var gcloud = require('gcloud') ({
 	projectId: 'vision-recognition-1338',
 	keyFilename: 'keyfile.json'
 });
+
 var CLOUD_BUCKET = 'vision-recognition-1338.appspot.com';
 
 var vision = gcloud.vision(),
@@ -25,7 +32,8 @@ var vision = gcloud.vision(),
 firebase.initializeApp({
 	serviceAccount: { 
 		projectId: 'vision-recognition-1338',
-		privateKey: '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCN/Z+/GVV6RvdC\nB9/pCcqJvc6U4w89mbdIFcJ+L9oOhwm0M0R2CzshrVu9+ox0UKiZY9Ph4X2snUIU\n+EPg7Dm86kxDwoe0JrpFTxdLgnuXsOwokiJWx8CFAl+ma0AtrzJdmHlTTnKJnLMB\n9Y4BEKi7PiUDFGFrnajVK5KvFzd/wgfzt+YExr4VUahscuT7s9Rk86b0CpVyKTmF\nByrq9zE9v2U4LN5Thmi/2roGuPgiLJLPbR480EuW2wOn0gXZzELZlW9FS7HBQqE2\nt4El/F6/NUZcKl9THuEcFgiQOMn0PAxSHXlHbBk1iMc+w2mYe6E8g0BrZ+bSCVXG\ng5uSiaIZAgMBAAECggEAP68rgPiJ4AgISjNh+BGOJ+1bxGd6pHRXQhuQWix4Lt/e\nOFZuNEuhP9+TMEg5ysmKdRHTLJKIXW1DAEjBmRYaZ2LmxdVwLBranM92cUWazVRq\n919jy2xYKs//upKL/HGBs3z5naWntZT0rMJH6K5iH2kmDJWNhEj4OnQKnEFbgQ8I\nffEnRwwd60xTwXiieLz5n+qC5iMnMKrLRauQfxIiqmDD8i9pJJ3c96/LtsibxbNq\n9ZYhnii1SMNnmcLTL47ppu/tWHrzRlil33DIMWFO8zN4WqZo3EGIHs78B5rW/9J+\nPuzVWZKjf2URBUW9tQPm9jngAdnOGe2eEKtnE8IxAQKBgQDGStL/+T2WdNi0jew0\n8CmnVaDgWhi/9Cos4DYRmgvlBMuDiAzQPEVaLg0452Qw/dseDtiF6ngQ9EVnitm5\n2K5L2qAya/y9CY6HS1mzv0AVgTEJ0pqLsBV3LhJi6hAjYSuyxOov/rD+rAY77xSr\n45I9XAUDMbo5L4c2ABzaN6bbCQKBgQC3UDgzZiJ/wJKZ1aySzgouevxs0hWHxbVe\nnIA5JtAlAkfn3QA8vMYIlNyciLpSskTN8Zqlavi6Z5CAxfplcxFyokcVuSsuL/qk\n9Aj+qNNhU9+FqMTnu2bg19A82qaQXC66JG+arWSBwk6L2SkLnPbxI9ffckXYzNrs\nfgyrPaWCkQKBgB8HMFMrng6ABDTkjFSQTARKKt1QW9UVkM/q2asRbtEMWggf7tla\nxQNid2EzHANqhbIDYrA5y0Xj40RbfsxM8qEd+blKGoc+CpZzHPs6bv2udIzz7ojz\nKbi3ddsSgyn2F49mrrqJ4QpIwsT4GUT4XDbLwmEIk/pEzKSPifQ/hxV5AoGAaBAu\nF1+frg5QKuxV73Dv7rr6mXwZpN3jvDXzxH34I0pML6ASBmjTswNuyZ4Ex/VTgeXp\n+IXldUxdh/zbzMOp3/2nhPl9PdcW3pV6lbaZaOMIPQQ146dLG9Dn8ePeMo1iKWGN\nya0tJUx88n7xAhq1ROcoITzp0c1Zam+UGZIBZ0ECgYAmBxMaesHsyKqBikp0oKA4\noSwvO/rh3uryZ4zKQ3wzUIQokJAfOKbK6FXyDREyYzlqPy1zCUSyf1R48JEq1e3/\nICyZG4iGY2BeTGjzYuW/bkuVM0xI3rleJTpib/zbIstEqE0Ay6dyZFqd/JZSssm7\nSEQMN2x+8IsmhtBNaUfOFQ==\n-----END PRIVATE KEY-----\n',
+		privateKey: '-----BEGIN PRIVATE KEY-----\n' +
+		'MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCN/Z+/GVV6RvdC\nB9/pCcqJvc6U4w89mbdIFcJ+L9oOhwm0M0R2CzshrVu9+ox0UKiZY9Ph4X2snUIU\n+EPg7Dm86kxDwoe0JrpFTxdLgnuXsOwokiJWx8CFAl+ma0AtrzJdmHlTTnKJnLMB\n9Y4BEKi7PiUDFGFrnajVK5KvFzd/wgfzt+YExr4VUahscuT7s9Rk86b0CpVyKTmF\nByrq9zE9v2U4LN5Thmi/2roGuPgiLJLPbR480EuW2wOn0gXZzELZlW9FS7HBQqE2\nt4El/F6/NUZcKl9THuEcFgiQOMn0PAxSHXlHbBk1iMc+w2mYe6E8g0BrZ+bSCVXG\ng5uSiaIZAgMBAAECggEAP68rgPiJ4AgISjNh+BGOJ+1bxGd6pHRXQhuQWix4Lt/e\nOFZuNEuhP9+TMEg5ysmKdRHTLJKIXW1DAEjBmRYaZ2LmxdVwLBranM92cUWazVRq\n919jy2xYKs//upKL/HGBs3z5naWntZT0rMJH6K5iH2kmDJWNhEj4OnQKnEFbgQ8I\nffEnRwwd60xTwXiieLz5n+qC5iMnMKrLRauQfxIiqmDD8i9pJJ3c96/LtsibxbNq\n9ZYhnii1SMNnmcLTL47ppu/tWHrzRlil33DIMWFO8zN4WqZo3EGIHs78B5rW/9J+\nPuzVWZKjf2URBUW9tQPm9jngAdnOGe2eEKtnE8IxAQKBgQDGStL/+T2WdNi0jew0\n8CmnVaDgWhi/9Cos4DYRmgvlBMuDiAzQPEVaLg0452Qw/dseDtiF6ngQ9EVnitm5\n2K5L2qAya/y9CY6HS1mzv0AVgTEJ0pqLsBV3LhJi6hAjYSuyxOov/rD+rAY77xSr\n45I9XAUDMbo5L4c2ABzaN6bbCQKBgQC3UDgzZiJ/wJKZ1aySzgouevxs0hWHxbVe\nnIA5JtAlAkfn3QA8vMYIlNyciLpSskTN8Zqlavi6Z5CAxfplcxFyokcVuSsuL/qk\n9Aj+qNNhU9+FqMTnu2bg19A82qaQXC66JG+arWSBwk6L2SkLnPbxI9ffckXYzNrs\nfgyrPaWCkQKBgB8HMFMrng6ABDTkjFSQTARKKt1QW9UVkM/q2asRbtEMWggf7tla\nxQNid2EzHANqhbIDYrA5y0Xj40RbfsxM8qEd+blKGoc+CpZzHPs6bv2udIzz7ojz\nKbi3ddsSgyn2F49mrrqJ4QpIwsT4GUT4XDbLwmEIk/pEzKSPifQ/hxV5AoGAaBAu\nF1+frg5QKuxV73Dv7rr6mXwZpN3jvDXzxH34I0pML6ASBmjTswNuyZ4Ex/VTgeXp\n+IXldUxdh/zbzMOp3/2nhPl9PdcW3pV6lbaZaOMIPQQ146dLG9Dn8ePeMo1iKWGN\nya0tJUx88n7xAhq1ROcoITzp0c1Zam+UGZIBZ0ECgYAmBxMaesHsyKqBikp0oKA4\noSwvO/rh3uryZ4zKQ3wzUIQokJAfOKbK6FXyDREyYzlqPy1zCUSyf1R48JEq1e3/\nICyZG4iGY2BeTGjzYuW/bkuVM0xI3rleJTpib/zbIstEqE0Ay6dyZFqd/JZSssm7\nSEQMN2x+8IsmhtBNaUfOFQ==\n-----END PRIVATE KEY-----\n',
 		clientEmail: 'vision-firebase@vision-recognition-1338.iam.gserviceaccount.com'
 	},
 	databaseURL: 'https://vision-recognition-1338.firebaseio.com/'
@@ -37,7 +45,6 @@ var db = firebase.database();
 var fbAuth = firebase.auth(),
 	dbRef = db.ref('imageDatas'),
 	image = 'demo.jpg';
-
 
 var numOfPeople = 0;
 
@@ -162,9 +169,22 @@ function main(image) {
 
 exports.main = main;
 
-module.exports = {
+module.exports = function () {
+	var data = {
+      users: [
+        { name: 'Tobi', age: 2, species: 'ferret' }
+      , { name: 'Loki', age: 2, species: 'ferret' }
+      , { name: 'Jane', age: 6, species: 'ferret' }
+      ]
+    };
+
+var ret = ejs.compile(read(path, 'utf8'), {filename: path})(data);
+console.log(ret);
+}
+
+/*module.exports = {
 	getPublicUrl: getPublicUrl
-};
+}; */
 
 if(module == require.main) {
 	exports.main(image);

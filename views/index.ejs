@@ -3,10 +3,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8" />
     <title> Google Vision Human Counter </title>
+    <% include head %>
 </head>
 <body class="container">
-
+    <header>
+      <% include header %>
+    </header>
     <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
     <script>
         // Initialize Firebase
@@ -23,9 +27,21 @@
 
     
     <main>
-            <h1>This is great</h1>
-            <p>Welcome to templating using EJS</p>
-        </div>
+        <div class="row">
+            <div class="col-sm-8">
+                
+                <div class="jumbotron">
+                    <h1>This is great</h1>
+                    <p>Welcome to templating using EJS</p>
+                    <% function user(user) { %>
+                        <li><strong><%=user.name %></strong> is a <%= user.age %> year old <%= user.species %>.</li>
+                        <% } %>
+                        <ul> 
+                            <% users.map(user) %>
+                        </ul>
+                </div>
+                </div>
+            </div>
     </main>
 
     <script>
