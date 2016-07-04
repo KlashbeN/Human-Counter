@@ -21,14 +21,17 @@ var path = require('path');
 
 var app = express();
 var router = express.Router();
-require('./views/scripts/vision.js')();
+var users = require('./routes/vision.js')();
 
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine' , 'ejs');
 
 app.get('/' , function(req, res) {
-	res.render('index');
+
+	res.render('index' , { 
+		users: users
+	});
 });
 
 // Basic 404 handler
@@ -41,4 +44,5 @@ var server = app.listen(process.env.PORT || '8080', function () {
   console.log('App listening on port %s', server.address().port);
   console.log('Press Ctrl+C to quit.');
 });
-// [END app]
+
+

@@ -1,4 +1,5 @@
 'use strict';
+
 // Firebase,gcloud,graphicsmagick,fs,ejs services
 
 var firebase = require("firebase"),
@@ -18,6 +19,7 @@ var gcloud = require('gcloud') ({
 });
 
 var CLOUD_BUCKET = 'vision-recognition-1338.appspot.com';
+var DATE = 'imageDatas/' + getDayDate();
 
 var vision = gcloud.vision(),
 	gcs = gcloud.storage(),
@@ -43,26 +45,32 @@ firebase.initializeApp({
 var db = firebase.database();
 
 var fbAuth = firebase.auth(),
-	dbRef = db.ref('imageDatas'),
-	image = 'demo.jpg';
+	dbRef = db.ref('imageDatas/'),
+	dateRef = db.ref(DATE ),
+	timeRef = db.ref(DATE + "/09:30");
 
-var numOfPeople = 0;
+var image = 'demo.jpg',
+	time = [],
+	date = [];
 
 //-------------------------Firebase Functions----------------------------//
 
 //Write image data
-function writeImageData(numOfPeople,imageName, imageData, imageURL) {
+function writeImageData(numOfPeople, imageName, imageURL) {
 
 	var imageData = { 
 		numOfPeople: numOfPeople,
 		imageName: imageName,
-		imageData: imageData,
 		imageURL: imageURL
 		};
 
 	//Update the database with the image data
+	var day = getDay(),
+		date = getDate(),
+		time = getTime();
+
 	var updates = {};
-	updates[getDay() + '/' + getTime()] = imageData; // Creates new branch called imageDatas
+	updates[dateConcat(day,date,time)] = imageData; // Creates new branch called imageDatas
 
 	return dbRef.update(updates);
 }
@@ -83,18 +91,33 @@ function writeData(info1, info2, info3) {
 }
 
 //Test
-function readData() {
+/*function readData() {
 	dbRef.on("value", function(snapshot) {
-		console.log(snapshot.val());
+		var value = snapshot.val();
+		console.log(value);
 	}, function(errorObject) {
 		console.log("Read failed:" + errorObject.code);
 	});
-}
+} */
 
-function getImageData() {
-	dbRef.on();
-}
-	
+function readAllData() {
+	dbRef.on("value", function(snapshot) { 
+		console.log(snapshot.val().name);
+		}, function(errorObject) {
+			console.log("Read failed:" + errorObject.code); 
+		// Now we have both childs, try iterating through and getting only the key for each of them.
+	});
+} 
+
+function readData() {
+	timeRef.on("value", function(snapshot) { 
+		console.log(snapshot.val());
+		}, function(errorObject) {
+			console.log("Read failed:" + errorObject.code);
+		// Now we have both childs, try iterating through and getting only the key for each of them.
+	});
+} 
+
 function uploadImage(image) {
 	bucket.upload(image , function(err,file) {
 		if(!err) { 
@@ -126,7 +149,21 @@ function countPeople(image,callback) {
 
 //---------------------------Miscelleneous------------------------------//
 
+
+
+function getTimeRef() { 
+	return 0;
+}
+
+function getDateRef() {
+	return 0;
+}
+
 // -------- Moment Functions ---------- //
+function getDayDate() {
+	return getDay() + ' ' + getDate();
+}
+
 function getDate() {
 	return moment().format('LL');
 }
@@ -139,6 +176,10 @@ function getTime() {
 	return moment().format("HH:mm");
 }
 
+function dateConcat(day , date , time) {
+	return day + ' ' + date + ' /' + time;
+}
+//---------------------------------//
 function getNumberOfPeople() {
 	return numOfPeople;
 }
@@ -157,30 +198,40 @@ return image;
 
 function main(image) {
 	/*countPeople(image, function(faces){
-		console.log('Found' + faces.length + 'face');
-		numOfPeople = faces.length;
+		var numOfPeople = faces.length;
+		console.log('Found ' + numOfPeople + ' face');
+		writeImageData(numOfPeople,image,getPublicUrl(image)); 
 	}); */
-	//writeData('hello','world','numOfPeople');
-	//readData();
-	//retrieveImage();
-	uploadImage(image);
+	//writeImageData(10,'demo.jpg', getPublicUrl(image));
+	readAllData();
+	//uploadImage(image);
 	console.log('done');
 }
 
 exports.main = main;
 
-module.exports = function () {
-	var data = {
-      users: [
+/* module.exports = function () {
+      var users = [
         { name: 'Tobi', age: 2, species: 'ferret' }
       , { name: 'Loki', age: 2, species: 'ferret' }
       , { name: 'Jane', age: 6, species: 'ferret' }
-      ]
-    };
+      ];
+ 
+	return users;
+} */
 
-var ret = ejs.compile(read(path, 'utf8'), {filename: path})(data);
-console.log(ret);
-}
+module.exports = { 
+	getUsers: function() { 
+		var users = [
+        { name: 'Tobi', age: 2, species: 'ferret' }
+      , { name: 'Loki', age: 2, species: 'ferret' }
+      , { name: 'Jane', age: 6, species: 'ferret' }
+      ];
+ 
+	return users;
+	}
+
+};
 
 /*module.exports = {
 	getPublicUrl: getPublicUrl

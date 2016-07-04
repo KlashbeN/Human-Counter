@@ -33,11 +33,10 @@
                 <div class="jumbotron">
                     <h1>This is great</h1>
                     <p>Welcome to templating using EJS</p>
-                    <% function user(user) { %>
+                    <ul>
+                    <% users.forEach(function(user) { %>
                         <li><strong><%=user.name %></strong> is a <%= user.age %> year old <%= user.species %>.</li>
-                        <% } %>
-                        <ul> 
-                            <% users.map(user) %>
+                        <% }); %>
                         </ul>
                 </div>
                 </div>
