@@ -50,8 +50,8 @@ var fbAuth = firebase.auth(),
 	timeRef = db.ref(DATE + "/09:30");
 
 var image = 'demo.jpg',
-	time = [],
-	date = [];
+	times = [],
+	dates = [];
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -102,7 +102,13 @@ function writeData(info1, info2, info3) {
 
 function readAllData() {
 	dbRef.on("value", function(snapshot) { 
-		console.log(snapshot.val().name);
+		var info = snapshot.val();
+		for( var key in info) {
+			dates.push(key);
+		}
+		dates.forEach(function(date) {
+			console.log(date);
+		});
 		}, function(errorObject) {
 			console.log("Read failed:" + errorObject.code); 
 		// Now we have both childs, try iterating through and getting only the key for each of them.
@@ -151,14 +157,25 @@ function countPeople(image,callback) {
 
 
 
-function getTimeRef() { 
-	return 0;
+function getTimeRef(dates) { 
+	dates.forEach(function(date) {
+		console.log(date);
+	});
 }
 
 function getDateRef() {
 	return 0;
 }
 
+function initDates() {
+		dbRef.on("value", function(snapshot) { 
+		var info = snapshot.val();
+		for( var key in info) {
+			dates.push(key);
+		}
+		getTimeRef(dates);
+	});
+}
 // -------- Moment Functions ---------- //
 function getDayDate() {
 	return getDay() + ' ' + getDate();
@@ -200,11 +217,13 @@ function main(image) {
 	/*countPeople(image, function(faces){
 		var numOfPeople = faces.length;
 		console.log('Found ' + numOfPeople + ' face');
-		writeImageData(numOfPeople,image,getPublicUrl(image)); 
+		writeImageDat
+		a(numOfPeople,image,getPublicUrl(image)); 
 	}); */
 	//writeImageData(10,'demo.jpg', getPublicUrl(image));
-	readAllData();
+	//readAllData();
 	//uploadImage(image);
+	initDates();
 	console.log('done');
 }
 
