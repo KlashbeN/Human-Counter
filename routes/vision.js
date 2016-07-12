@@ -5,7 +5,9 @@
 var firebase = require("firebase"),
     fs = require('fs'),
     gm = require('gm'),
-    moment = require('moment');
+    moment = require('moment'),
+    promise = require('promise'),
+    async = require('async');
 
 var ejs = require('ejs'),
     read = fs.readFileSync,
@@ -42,16 +44,14 @@ firebase.initializeApp({
 });
 
 // As an admin, the app has access to read and write all data, regardless of Security Rules
-var db = firebase.database();
-
-var fbAuth = firebase.auth(),
+var db = firebase.database(),
+    fbAuth = firebase.auth(),
     dbRef = db.ref(DBNAME),
-    dateRef = db.ref(DATE),
-    timeRef = db.ref(DATE + "/09:30");
+    testRef = db.ref(DBNAME + "Monday July 4, 2016 " + "/09:57");
 
 var image = 'demo.jpg',
-    times = [],
-    dates = [];
+    dates = [],
+    times = [];
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -90,30 +90,120 @@ function writeData(info1, info2, info3) {
     return dbRef.update(updates);
 }
 
-//Test
-/*function readData() {
-	dbRef.on("value", function(snapshot) {
-		var value = snapshot.val();
-		console.log(value);
-	}, function(errorObject) {
-		console.log("Read failed:" + errorObject.code);
-	});
-} */
 
-// TODO: Write a loop to iterate through all of the data
+// TODO: Promise initDates first and initTime, next figure out how to loop through both.
+// TODO: Figure out how to get the time first for each date before obtaining the data!!
+// TODO: Figure out how to transfer the data out!
+// TODO: Add promise to this function, maybe we  can try for loop with a function inside the for loop?
+// TODO" Try promise.each
 
 function readAllData() {
-    dbRef.on("value", function(snapshot) {
-        var info = snapshot.val();
-        for (var key in info) {
-            dates.push(key);
-        }
+    //var images = []; // putting this to global works
+    return new Promise(function(resolve, reject) {
+        var images = [];
         dates.forEach(function(date) {
-            console.log(date);
+            getTimeRef(date).then(function(timeRefs) {
+                timeRefs.forEach(function(timeStamp) {
+                    var path = getPath(date, timeStamp);
+                    path.then(function(res) {
+                        db.ref(res).on("value", function(snapshot) {
+                            console.log(timeStamp);
+                            console.log(snapshot.val());
+                            images.push({
+                                name: snapshot.val().imageName,
+                                numOfPeople: snapshot.val().numOfPeople,
+                                url: snapshot.val().imageURL,
+                                time: timeStamp
+                            });
+                        })
+                    })
+                })
+            })
         });
+        resolve(images);
+    })
+}
+
+function readAllData2() {
+    return new Promise(function(resolve, reject) {
+        var images = [];
+        async.each(dates, function(date, callback) {
+            getTimeRef(date).then(function(timeRefs) {
+                async.each(timeRefs, function(timeStamp, callback) {
+                    var path = getPath(date, timeStamp);
+                    path.then(function(res) {
+                        db.ref(res).on("value", function(snapshot) {
+                            console.log(timeStamp);
+                            console.log(snapshot.val());
+                            images.push({
+                                name: snapshot.val().imageName,
+                                numOfPeople: snapshot.val().numOfPeople,
+                                url: snapshot.val().imageURL,
+                                time: timeStamp
+                            });
+                            console.log(images.length);
+                            callback();
+                        })
+                    })
+                }, function(err) {
+                    console.log("Finish iterating - Part 1 \n");
+                    callback();
+                })
+            })
+        }, function(err) {
+            console.log("Finish iterating!");
+            console.log(images.length);
+            resolve(images);
+        });
+    });
+}
+
+
+function getImages(images) {
+    console.log(images.length + "lENGTH");
+    images.forEach(function(image) {
+      console.log(image.name);
+      console.log(image.numOfPeople);
+      console.log(image.url);
+      console.log(image.time);
+      console.log("\n");  
+    });
+}
+
+function getImageName(image) {
+    return image.name;
+}
+
+function getNumOfPeople(image) {
+    return image.numOfPeople;
+}
+
+function getImageTime(image) {
+    return image.numOfPeople;
+}
+
+function getImageURL(image) {
+    return image.url;
+}
+
+function getPath(date, timeStamp) {
+    return new Promise(function(resolve, reject) {
+        resolve(DBNAME + date + "/" + timeStamp);
+    });
+}
+
+function readData(path) {
+    db.ref(path).on("value", function(snapshot) {
+        console.log(snapshot.val());
     }, function(errorObject) {
         console.log("Read failed:" + errorObject.code);
-        // Now we have both childs, try iterating through and getting only the key for each of them.
+    });
+}
+
+
+function displayAllData() {
+    testRef.on("value", function(snapshot) {
+        console.log(snapshot.val());
     });
 }
 
@@ -160,27 +250,32 @@ function countPeople(image, callback) {
 
 // TODO: Figure out how to utilize all of the timing of all dates
 
-function getTimeRef(dates) {
-    dates.forEach(function(date) {
+function getTimeRef(date) {
+    return new Promise(function(resolve, reject) {
+        var timeRefs = [];
         var ref = db.ref('imageDatas' + "/" + date);
         ref.on("value", function(snapshot) {
-            var timing = snapshot.val();
-            for (var timez in timing) {
-                console.log(timez);
+            var timeStamps = snapshot.val();
+            for (var timeStamp in timeStamps) {
+                timeRefs.push(timeStamp);
             }
+            resolve(timeRefs);
         });
     });
 }
 
+
 // TODO: Utilize this to get all of the data
 
 function initDates() {
-    dbRef.on("value", function(snapshot) {
-        var info = snapshot.val();
-        for (var key in info) {
-            dates.push(key);
-        }
-        getTimeRef(dates);
+    return new Promise(function(resolve, reject) {
+        dbRef.on("value", function(snapshot) {
+            var info = snapshot.val();
+            for (var key in info) {
+                dates.push(key);
+            }
+            resolve();
+        });
     });
 }
 // -------- Moment Functions ---------- //
@@ -228,10 +323,16 @@ function main(image) {
     	a(numOfPeople,image,getPublicUrl(image));
     }); */
     //writeImageData(10,'demo.jpg', getPublicUrl(image));
-    //readAllData();
     //uploadImage(image);
-    initDates();
-    console.log('done');
+    console.log("hi");
+    initDates().then(function() {
+        return readAllData2()
+    }).then(function(res) {
+      console.log("i am here");
+        getImages(res)
+    });
+    //setTimeout(function() {getImages();}, 5000);
+
 }
 
 exports.main = main;
@@ -247,29 +348,38 @@ exports.main = main;
 } */
 
 module.exports = {
-    getUsers: function() {
-        var users = [{
-            name: 'Tobi',
-            age: 2,
-            species: 'ferret'
-        }, {
-            name: 'Loki',
-            age: 2,
-            species: 'ferret'
-        }, {
-            name: 'Jane',
-            age: 6,
-            species: 'ferret'
-        }];
+        getUsers: function() {
+            var users = [{
+                name: 'Tobi',
+                age: 2,
+                species: 'ferret'
+            }, {
+                name: 'Loki',
+                age: 2,
+                species: 'ferret'
+            }, {
+                name: 'Jane',
+                age: 6,
+                species: 'ferret'
+            }];
 
-        return users;
+            return users;
+        },
+        getImage: function() {
+            var info = readAllData()
+            info.then(function(res) {
+                getImages(res)
+            });
+            this.data = function() {
+                return images
+            };
+        }
+
     }
-
-};
-
-/*module.exports = {
-	getPublicUrl: getPublicUrl
-}; */
+    /*
+    module.exports = {
+    	getPublicUrl: getPublicUrl
+    }; */
 
 if (module == require.main) {
     exports.main(image);

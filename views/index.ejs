@@ -25,17 +25,17 @@
     </script>
 
 
-    
+
     <main>
         <div class="row">
             <div class="col-sm-8">
-                
+
                 <div class="jumbotron">
                     <h1>This is great</h1>
                     <p>Welcome to templating using EJS</p>
                     <ul>
-                    <% users.forEach(function(user) { %>
-                        <li><strong><%=user.name %></strong> is a <%= user.age %> year old <%= user.species %>.</li>
+                    <% images.forEach(function(images) { %>
+                        <li><strong><%=images.name %></strong> is a <%= images.numOfPeople %> year old <%= images.time %>.</li>
                         <% }); %>
                         </ul>
                 </div>

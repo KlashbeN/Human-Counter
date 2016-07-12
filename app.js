@@ -18,10 +18,10 @@
 
 var express = require('express');
 var path = require('path');
-
+var promise = require('promise');
 var app = express();
 var router = express.Router();
-var users = require('./routes/vision.js')();
+var images = require('./routes/vision.js').getImage();
 
 
 app.set('views', path.join(__dirname, 'views'));
@@ -29,8 +29,8 @@ app.set('view engine' , 'ejs');
 
 app.get('/' , function(req, res) {
 
-	res.render('index' , { 
-		users: users
+	res.render('index' , {
+		images: images
 	});
 });
 
@@ -44,5 +44,3 @@ var server = app.listen(process.env.PORT || '8080', function () {
   console.log('App listening on port %s', server.address().port);
   console.log('Press Ctrl+C to quit.');
 });
-
-
