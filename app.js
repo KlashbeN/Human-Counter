@@ -21,18 +21,25 @@ var path = require('path');
 var promise = require('promise');
 var app = express();
 var router = express.Router();
-var images = require('./routes/vision.js').getImage();
-
+var vision = require('./routes/vision.js');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine' , 'ejs');
 
 app.get('/' , function(req, res) {
-
+	vision.getImageData().then(function(images) {
+		console.log(images.length + "PLEASE");
 	res.render('index' , {
 		images: images
 	});
 });
+});
+
+/*
+app.get('/', function(req,res) {
+	res.render('index');
+}); */
+
 
 // Basic 404 handler
 app.use(function (req, res) {

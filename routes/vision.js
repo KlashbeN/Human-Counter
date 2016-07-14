@@ -4,7 +4,7 @@
 
 var firebase = require("firebase"),
     fs = require('fs'),
-    gm = require('gm'),
+  //  gm = require('gm'),
     moment = require('moment'),
     promise = require('promise'),
     async = require('async');
@@ -97,7 +97,7 @@ function writeData(info1, info2, info3) {
 // TODO: Add promise to this function, maybe we  can try for loop with a function inside the for loop?
 // TODO" Try promise.each
 
-function readAllData() {
+function readAllData3() {
     //var images = []; // putting this to global works
     return new Promise(function(resolve, reject) {
         var images = [];
@@ -124,7 +124,9 @@ function readAllData() {
     })
 }
 
-function readAllData2() {
+//NOTE: DONE syncing
+
+function readAllData() {
     return new Promise(function(resolve, reject) {
         var images = [];
         async.each(dates, function(date, callback) {
@@ -146,13 +148,12 @@ function readAllData2() {
                         })
                     })
                 }, function(err) {
-                    console.log("Finish iterating - Part 1 \n");
+                    console.log("Finish iterating times \n");
                     callback();
                 })
             })
         }, function(err) {
             console.log("Finish iterating!");
-            console.log(images.length);
             resolve(images);
         });
     });
@@ -160,30 +161,11 @@ function readAllData2() {
 
 
 function getImages(images) {
-    console.log(images.length + "lENGTH");
+    console.log(images.length + "LENGTH");
     images.forEach(function(image) {
-      console.log(image.name);
-      console.log(image.numOfPeople);
-      console.log(image.url);
-      console.log(image.time);
-      console.log("\n");  
+      console.log(image.name + " " + image.numOfPeople);
+      console.log(image.url + " " + image.time + "\n");
     });
-}
-
-function getImageName(image) {
-    return image.name;
-}
-
-function getNumOfPeople(image) {
-    return image.numOfPeople;
-}
-
-function getImageTime(image) {
-    return image.numOfPeople;
-}
-
-function getImageURL(image) {
-    return image.url;
 }
 
 function getPath(date, timeStamp) {
@@ -308,12 +290,12 @@ function getImageMetadata(image) {
 
 }
 
-function imageResize(image) {
+/*function imageResize(image) {
     gm(image).resizeExact(640, 480).write(image, function(err) {
         if (!err) console.log('done resizing');
     });
     return image;
-}
+} */
 
 function main(image) {
     /*countPeople(image, function(faces){
@@ -326,9 +308,8 @@ function main(image) {
     //uploadImage(image);
     console.log("hi");
     initDates().then(function() {
-        return readAllData2()
+        return readAllData()
     }).then(function(res) {
-      console.log("i am here");
         getImages(res)
     });
     //setTimeout(function() {getImages();}, 5000);
@@ -373,8 +354,25 @@ module.exports = {
             this.data = function() {
                 return images
             };
-        }
-
+        },
+        getImageData: function(){
+          return new Promise( function(resolve) {
+          initDates().then(function() {
+              return readAllData()
+          }).then(function(images) { resolve(images)})
+        })
+      }
+    /*  getImageData: function() {
+        
+        var images = [{
+          name: 'demo.jpg',
+          numOfPeople: '2',
+          url:'wwww.google.com',
+          time: '11:00'
+        }];
+        return images;
+      }
+ */
     }
     /*
     module.exports = {

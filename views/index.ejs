@@ -12,30 +12,17 @@
       <% include header %>
     </header>
     <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
-    <script>
-        // Initialize Firebase
-            var config = {
-            apiKey: "AIzaSyAmZB2B45FM36JryBmop4qd26I_AVyqf3g",
-            authDomain: "vision-recognition-1338.firebaseapp.com",
-            databaseURL: "https://vision-recognition-1338.firebaseio.com",
-            storageBucket: "vision-recognition-1338.appspot.com",
-        };
-            firebase.initializeApp(config);
-
-    </script>
-
-
-
     <main>
         <div class="row">
             <div class="col-sm-8">
 
                 <div class="jumbotron">
-                    <h1>This is great</h1>
-                    <p>Welcome to templating using EJS</p>
+                    <h1>Google project</h1>
+                    <p>Vision Recognition</p>
                     <ul>
-                    <% images.forEach(function(images) { %>
-                        <li><strong><%=images.name %></strong> is a <%= images.numOfPeople %> year old <%= images.time %>.</li>
+                      <% images.forEach(function(images) { %>
+                        <li><strong><%=images.name %></strong> is a
+                        <%= images.numOfPeople %> year old <%= images.time %>.</li>
                         <% }); %>
                         </ul>
                 </div>
