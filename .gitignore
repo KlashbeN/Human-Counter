@@ -40,3 +40,7 @@ jspm_packages
 .node_repl_history
 
 views/index.pug
+
+# Json keys
+keyfile.json
+serviceAccountCredentials.json

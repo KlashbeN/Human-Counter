@@ -21,8 +21,9 @@
                     <p>Vision Recognition</p>
                     <ul>
                       <% images.forEach(function(images) { %>
-                        <li><strong><%=images.name %></strong> is a
-                        <%= images.numOfPeople %> year old <%= images.time %>.</li>
+                        <img src='<%= images.url %>' />
+                        <li><strong><%=images.name %></strong> There are
+                        <%= images.numOfPeople %> people in the image at <%= images.time %>.</li>
                         <% }); %>
                         </ul>
                 </div>
