@@ -4,7 +4,7 @@
 
 var firebase = require("firebase"),
     fs = require('fs'),
-  //  gm = require('gm'),
+    gm = require('gm'),
     moment = require('moment'),
     promise = require('promise'),
     async = require('async');
@@ -74,21 +74,6 @@ function writeImageData(numOfPeople, imageName, imageURL) {
 
     return dbRef.update(updates);
 }
-//Test
-
-function writeData(info1, info2, info3) {
-    var data = {
-        info1: info1,
-        info2: info2,
-        info3: info3
-    };
-    var newDataKey = dbRef.child('imageDatas').push().key;
-
-    var updates = {};
-    //updates[newDataKey] = data; // Creates new branch only with the newDataKey
-    updates[getDay() + ' ' + getDate() + '/' + getTime()] = data;
-    return dbRef.update(updates);
-}
 
 
 // TODO: Promise initDates first and initTime, next figure out how to loop through both.
@@ -96,35 +81,7 @@ function writeData(info1, info2, info3) {
 // TODO: Figure out how to transfer the data out!
 // TODO: Add promise to this function, maybe we  can try for loop with a function inside the for loop?
 // TODO" Try promise.each
-
-function readAllData3() {
-    //var images = []; // putting this to global works
-    return new Promise(function(resolve, reject) {
-        var images = [];
-        dates.forEach(function(date) {
-            getTimeRef(date).then(function(timeRefs) {
-                timeRefs.forEach(function(timeStamp) {
-                    var path = getPath(date, timeStamp);
-                    path.then(function(res) {
-                        db.ref(res).on("value", function(snapshot) {
-                            console.log(timeStamp);
-                            console.log(snapshot.val());
-                            images.push({
-                                name: snapshot.val().imageName,
-                                numOfPeople: snapshot.val().numOfPeople,
-                                url: snapshot.val().imageURL,
-                                time: timeStamp
-                            });
-                        })
-                    })
-                })
-            })
-        });
-        resolve(images);
-    })
-}
-
-//NOTE: DONE syncing
+// NOTE: DONE syncing
 
 function readAllData() {
     return new Promise(function(resolve, reject) {
@@ -163,8 +120,8 @@ function readAllData() {
 function getImages(images) {
     console.log(images.length + "LENGTH");
     images.forEach(function(image) {
-      console.log(image.name + " " + image.numOfPeople);
-      console.log(image.url + " " + image.time + "\n");
+        console.log(image.name + " " + image.numOfPeople);
+        console.log(image.url + " " + image.time + "\n");
     });
 }
 
@@ -290,12 +247,12 @@ function getImageMetadata(image) {
 
 }
 
-/*function imageResize(image) {
+function imageResize(image) {
     gm(image).resizeExact(640, 480).write(image, function(err) {
         if (!err) console.log('done resizing');
     });
     return image;
-} */
+}
 
 function main(image) {
     /*countPeople(image, function(faces){
@@ -312,72 +269,48 @@ function main(image) {
     }).then(function(res) {
         getImages(res)
     });
-    //setTimeout(function() {getImages();}, 5000);
-
 }
 
 exports.main = main;
 
-/* module.exports = function () {
-      var users = [
-        { name: 'Tobi', age: 2, species: 'ferret' }
-      , { name: 'Loki', age: 2, species: 'ferret' }
-      , { name: 'Jane', age: 6, species: 'ferret' }
-      ];
-
-	return users;
-} */
-
 module.exports = {
-        getUsers: function() {
-            var users = [{
-                name: 'Tobi',
-                age: 2,
-                species: 'ferret'
-            }, {
-                name: 'Loki',
-                age: 2,
-                species: 'ferret'
-            }, {
-                name: 'Jane',
-                age: 6,
-                species: 'ferret'
-            }];
-
-            return users;
-        },
-        getImage: function() {
-            var info = readAllData()
-            info.then(function(res) {
-                getImages(res)
-            });
-            this.data = function() {
-                return images
-            };
-        },
-        getImageData: function(){
-          return new Promise( function(resolve) {
-          initDates().then(function() {
-              return readAllData()
-          }).then(function(images) { resolve(images)})
-        })
-      }
-    /*  getImageData: function() {
-        
-        var images = [{
-          name: 'demo.jpg',
-          numOfPeople: '2',
-          url:'wwww.google.com',
-          time: '11:00'
+    getUsers: function() {
+        var users = [{
+            name: 'Tobi',
+            age: 2,
+            species: 'ferret'
+        }, {
+            name: 'Loki',
+            age: 2,
+            species: 'ferret'
+        }, {
+            name: 'Jane',
+            age: 6,
+            species: 'ferret'
         }];
-        return images;
-      }
- */
+
+        return users;
+    },
+    getImage: function() {
+        var info = readAllData()
+        info.then(function(res) {
+            getImages(res)
+        });
+        this.data = function() {
+            return images
+        };
+    },
+    getImageData: function() {
+        return new Promise(function(resolve) {
+            initDates().then(function() {
+                return readAllData()
+            }).then(function(images) {
+                resolve(images)
+            })
+        })
     }
-    /*
-    module.exports = {
-    	getPublicUrl: getPublicUrl
-    }; */
+}
+
 
 if (module == require.main) {
     exports.main(image);
