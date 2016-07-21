@@ -44,3 +44,5 @@ views/index.pug
 # Json keys
 keyfile.json
 serviceAccountCredentials.json
+
+*.jpg
