@@ -1,7 +1,5 @@
 'use strict';
 
-// Firebase,gcloud,graphicsmagick,fs,ejs services
-
 var firebase = require("firebase"),
     fs = require('fs'),
     gm = require('gm'),
@@ -153,6 +151,18 @@ function readData() {
     });
 }
 
+
+
+//-------------------------Google Cloud Functions----------------------------//
+
+
+function countPeople(image, callback) {
+    vision.detectFaces(image, function(error, faces) {
+        if (error) throw error;
+        callback(faces);
+    });
+}
+
 function uploadImage(image) {
     bucket.upload(image, function(err, file) {
         if (!err) {
@@ -166,21 +176,6 @@ function retrieveImage() {
         destination: 'test1.jpg'
     }, function(err) {});
 }
-
-function getPublicUrl(image) {
-    return 'https://storage.googleapis.com/' + CLOUD_BUCKET + '/' + image;
-}
-
-//-------------------------Google Vision Functions----------------------------//
-
-
-function countPeople(image, callback) {
-    vision.detectFaces(image, function(error, faces) {
-        if (error) throw error;
-        callback(faces);
-    });
-}
-
 
 //---------------------------Miscelleneous------------------------------//
 
@@ -216,6 +211,27 @@ function initDates() {
     });
 }
 
+function imageResize(image) {
+    gm(image).resizeExact(640, 480).write(image, function(err) {
+        if (!err) console.log('done resizing');
+    });
+    return image;
+}
+
+function promptUser() {
+    return new promise(function(resolve, reject) {
+        prompt.start();
+        prompt.get(['imageName'], function(err, result) {
+            if (result.imageName === 'q') {
+                process.exit();
+            } else {
+                resolve(result.imageName);
+            }
+        })
+    })
+}
+
+
 // -------- Moment Functions ---------- //
 function getDayDate() {
     return getDay() + ' ' + getDate();
@@ -237,30 +253,21 @@ function dateConcat(day, date, time) {
     return day + ' ' + date + ' /' + time;
 }
 
+
 //-----------Getters---------------//
+
 function getNumberOfPeople() {
     return numOfPeople;
 }
 
-function imageResize(image) {
-    gm(image).resizeExact(640, 480).write(image, function(err) {
-        if (!err) console.log('done resizing');
-    });
-    return image;
+function getAvgNum(counter, numOfPeople) {
+  return numOfPeople/counter;
 }
 
-function promptUser() {
-    return new promise(function(resolve, reject) {
-        prompt.start();
-        prompt.get(['imageName'], function(err, result) {
-            if (result.imageName === 'q') {
-                process.exit();
-            } else {
-                resolve(result.imageName);
-            }
-        })
-    })
+function getPublicUrl(image) {
+    return 'https://storage.googleapis.com/' + CLOUD_BUCKET + '/' + image;
 }
+
 
 //NOTE: Working loop for continuous input from the user.
 
