@@ -51,7 +51,6 @@ var db = firebase.database(),
     testRef = db.ref(DBNAME + "Monday July 4, 2016 " + "/09:57");
 
 var image = 'demo.jpg',
-    image2 = 'demo6.jpg',
     dates = [],
     times = [];
 
@@ -82,7 +81,6 @@ function writeImageData(numOfPeople, imageName, imageURL) {
 // TODO: Figure out how to get the time first for each date before obtaining the data!!
 // TODO: Figure out how to transfer the data out!
 // TODO: Add promise to this function, maybe we  can try for loop with a function inside the for loop?
-// TODO" Try promise.each
 // NOTE: DONE syncing
 
 function readAllData() {
@@ -120,7 +118,6 @@ function readAllData() {
 
 
 function getImages(images) {
-    console.log(images.length + "LENGTH");
     images.forEach(function(image) {
         console.log(image.name + " " + image.numOfPeople);
         console.log(image.url + " " + image.time + "\n");
@@ -140,7 +137,6 @@ function readData(path) {
         console.log("Read failed:" + errorObject.code);
     });
 }
-
 
 function displayAllData() {
     testRef.on("value", function(snapshot) {
@@ -219,6 +215,7 @@ function initDates() {
         });
     });
 }
+
 // -------- Moment Functions ---------- //
 function getDayDate() {
     return getDay() + ' ' + getDate();
@@ -239,14 +236,10 @@ function getTime() {
 function dateConcat(day, date, time) {
     return day + ' ' + date + ' /' + time;
 }
-//---------------------------------//
+
+//-----------Getters---------------//
 function getNumberOfPeople() {
     return numOfPeople;
-}
-
-
-function getImageMetadata(image) {
-
 }
 
 function imageResize(image) {
@@ -269,20 +262,6 @@ function promptUser() {
     })
 }
 
-function promptUsers() {
-    prompt.start();
-    prompt.get(['image name'], function(err, result) {
-        if (result.name == 'q') {
-            process.exit();
-        }
-    }).then(function() {
-        countPeople(result.name, function(faces) {
-            var numOfPeople = faces.length;
-            console.log('Found' + numOfPeople + 'face');
-            promptUsers();
-        })
-    })
-}
 //NOTE: Working loop for continuous input from the user.
 
 function humanCounter() {
@@ -317,45 +296,18 @@ function humanCounter() {
     }).then(function(res) {
         getImages(res)
     });
-
 }
 */
+
 function main() {
   humanCounter();
 }
 
 
-
-
 exports.main = main;
 
 module.exports = {
-    getUsers: function() {
-        var users = [{
-            name: 'Tobi',
-            age: 2,
-            species: 'ferret'
-        }, {
-            name: 'Loki',
-            age: 2,
-            species: 'ferret'
-        }, {
-            name: 'Jane',
-            age: 6,
-            species: 'ferret'
-        }];
 
-        return users;
-    },
-    getImage: function() {
-        var info = readAllData()
-        info.then(function(res) {
-            getImages(res)
-        });
-        this.data = function() {
-            return images
-        };
-    },
     getImageData: function() {
         return new Promise(function(resolve) {
             initDates().then(function() {
@@ -367,10 +319,6 @@ module.exports = {
     }
 }
 
-
-/*if (module == require.main) {
-    exports.main(image2)
-} */
 
 if (module == require.main) {
     var photo = process.argv[2];

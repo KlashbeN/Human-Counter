@@ -28,17 +28,11 @@ app.set('view engine' , 'ejs');
 
 app.get('/' , function(req, res) {
 	vision.getImageData().then(function(images) {
-		console.log(images.length + "PLEASE");
 	res.render('index' , {
 		images: images
 	});
 });
 });
-
-/*
-app.get('/', function(req,res) {
-	res.render('index');
-}); */
 
 
 // Basic 404 handler
