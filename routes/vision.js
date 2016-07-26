@@ -50,7 +50,9 @@ var db = firebase.database(),
 
 var image = 'demo.jpg',
     dates = [],
-    times = [];
+    times = [],
+    uri = "gs://vision-recognition-1338.appspot.com/demo.jpg",
+    url = 'https://storage.googleapis.com/vision-recognition-1338.appspot.com/demo.jpg'
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -265,9 +267,16 @@ function getAvgNum(counter, numOfPeople) {
 }
 
 function getPublicUrl(image) {
-    return 'https://storage.googleapis.com/' + CLOUD_BUCKET + '/' + image;
+  return 'https://storage.googleapis.com/' +
+    CLOUD_BUCKET + '/' + image;
 }
 
+// Returns the Google Cloud Storage object URI.
+function getStorageUri(filename) {
+  return 'gs://' +
+    CLOUD_BUCKET +
+    '/' + filename;
+}
 
 //NOTE: Working loop for continuous input from the user.
 
@@ -287,29 +296,25 @@ function humanCounter() {
 // TODO: Prompt then process the image. Loop the process non stop.
 
 
-/*function main(image) {
-    var userReq = promptUser();
-    userReq.then(function() {
+function main(image) {
     countPeople(image, function(faces){
     	var numOfPeople = faces.length;
     	console.log('Found ' + numOfPeople + ' face');
     	//writeImageData(numOfPeople,image,getPublicUrl(image));
     });
-  });
     //uploadImage(image);
-
     initDates().then(function() {
         return readAllData()
     }).then(function(res) {
         getImages(res)
     });
 }
-*/
 
+/*
 function main() {
   humanCounter();
 }
-
+*/
 
 exports.main = main;
 
@@ -329,5 +334,5 @@ module.exports = {
 
 if (module == require.main) {
     var photo = process.argv[2];
-    exports.main();
+    exports.main(url);
 }

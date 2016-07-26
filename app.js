@@ -18,21 +18,41 @@
 
 var express = require('express');
 var path = require('path');
-var promise = require('promise');
 var app = express();
 var router = express.Router();
 var vision = require('./routes/vision.js');
+//var session = require('cookie-session');
+
+//var config = require('./config');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine' , 'ejs');
 
-app.get('/' , function(req, res) {
+/*app.get('/' , function(req, res) {
 	vision.getImageData().then(function(images) {
 	res.render('index' , {
 		images: images
 	});
 });
-});
+}); */
+
+/*app.use(session({
+  secret: config.secret,
+  signed: true
+})); */
+
+/*
+var oauth2 = require('./routes/oauth2')(config.oauth2);
+app.use(oauth2.router);
+app.use(oauth2.aware);
+app.use(oauth2.template);
+*/
+
+// Configure routes
+
+app.use('/', require('./routes/routes')(
+  vision
+));
 
 
 // Basic 404 handler
