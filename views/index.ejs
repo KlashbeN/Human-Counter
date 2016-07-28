@@ -15,40 +15,14 @@
         </header>
         <script src="https://www.gstatic.com/firebasejs/3.2.0/firebase.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-              var file = document.getElementById('file');
-
             // Initialize Firebase
             var config = {
                 apiKey: "AIzaSyAmZB2B45FM36JryBmop4qd26I_AVyqf3g",
                 authDomain: "vision-recognition-1338.firebaseapp.com",
                 databaseURL: "https://vision-recognition-1338.firebaseio.com",
-                storageBucket: "vision-recognition-1338.appspot.com",
+                storageBucket: "vision-recognition-1338.appspot.com"
             };
-            var app = firebase.initializeApp(config),
-                database = app.database(),
-                storage = app.storage();
-
-                // Handling image uploads to Firebase storage
-                function handleImageFile(e) {
-                  e.preventDefault();
-                  var files = e.target.files,
-                  i,file;
-                  var uploadImage = storage.ref().child(file.name).put(file);
-                  uploadImage.on('state_changed',null,function(error) {
-                    console.log('Upload to Firebase storage failed', error)
-                  }, function() {
-                    console.log('Upload successful to Firebase storage')
-                  }.bind(uploadImage));
-                  return false;
-
-
-                }
-                file.addEventListener('change',handleImageFile, false);
-
-          });
         </script>
-
 
         <main>
             <div class="row">
@@ -57,22 +31,33 @@
                         <h1>Google project</h1>
                         <p>Vision Recognition</p>
 
-                        <form>
-                            Number of service counter:
-                            <input type="text" name="numOfCounter"><br>
+                        <form action="/update/counter" form method="POST">
+                            <div class="form-group">
+                                Number of service counter:
+                                <input type="text" id="numOfCounter" name="numOfCounter"><br>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Submit"><br>
+                            </div>
                         </form>
-                        <form>
-                            <input type="file" id="file" name="filename" accept="image/jpg, image/png">
+                        <form action="/upload" form method="POST">
+                            <div class="form-image">
+                                <input type="file" id="file" name="file" accept="image/jpg, image/png">
+                            </div>
+                            <div class="form-image">
+                                <input type="submit" value="Upload"><br>
+                            </div>
                         </form>
+
                         <ul>
-                            <% images.forEach(function(images) { %>
+                            <% images.forEach(function(image) { %>
                                 <img src='<%= images.url %>'/>
                                 <li>
-                                    <strong><%=images.name %></strong>
+                                    <strong><%=image.name %></strong>
                                     There are
-                                    <%= images.numOfPeople %>
+                                    <%= image.numOfPeople %>
                                     people in the image at
-                                    <%= images.time %>.</li>
+                                    <%= image.time %>.</li>
                             <% }); %>
                         </ul>
                     </div>

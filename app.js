@@ -21,9 +21,13 @@ var path = require('path');
 var app = express();
 var router = express.Router();
 var vision = require('./routes/vision.js');
+var bodyParser = require('body-parser');
+
 //var session = require('cookie-session');
 
 //var config = require('./config');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine' , 'ejs');
@@ -53,6 +57,7 @@ app.use(oauth2.template);
 app.use('/', require('./routes/routes')(
   vision
 ));
+
 
 
 // Basic 404 handler

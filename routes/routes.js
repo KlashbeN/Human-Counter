@@ -1,18 +1,42 @@
 'use strict';
 
 var express = require('express'),
-    router = express.Router();
+    bodyParser = require('body-parser');
+
+
+var router = express.Router();
+
 
 var routes = function(vision) {
 
-router.get('/', function(req,res) {
-  vision.getImageData().then(function(images) {
-    res.render('index', {
-      images: images
+    router.get('/', function(req, res) {
+        vision.getImageData().then(function(images) {
+            res.render('index', {
+                images: images
+            });
+        });
     });
-  });
-});
-  return router;
+
+    router.post('/update/counter', function(req, res) { // Be sure to use the correct action
+        console.log("NUMBER" + req.body.numOfCounter);
+        vision.getImageData().then(function(images) {
+            res.render('index', {
+                images: images
+            });
+        });
+    });
+
+    router.post('/upload', function(req, res) {
+        vision.writeData(10,5,6).then(function() {
+            vision.getImageData().then(function(images) {
+                res.render('index', {
+                    images: images
+                });
+            });
+        });
+    });
+    return router;
 };
+
 
 module.exports = routes;
