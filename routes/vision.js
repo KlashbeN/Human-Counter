@@ -20,7 +20,6 @@ var gcloud = require('gcloud')({
 
 var CLOUD_BUCKET = 'vision-recognition-1338.appspot.com';
 var DBNAME = 'imageDatas/';
-var DATE = 'imageDatas/' + getDayDate();
 
 var vision = gcloud.vision(),
     gcs = gcloud.storage(),
@@ -49,27 +48,28 @@ var db = firebase.database(),
     testRef = db.ref(DBNAME + "Monday July 4, 2016 " + "/09:57");
 
 var image = 'demo2.jpg',
-  //  dates = [],
-    times = [];
+    numOfCounters = 1;
 
 //-------------------------Firebase Functions----------------------------//
 
 //Write image data
-function writeImageData(numOfPeople, imageName, imageURL) {
+function writeImageData(numOfPeople, numOfCounters, imageName, imageURL) {
     return new Promise(function(resolve) {
             var imageData = {
                 numOfPeople: numOfPeople,
+                numOfCounters: numOfCounters,
                 imageName: imageName,
                 imageURL: imageURL
             };
 
             //Update the database with the image data
-            var day = getDay(),
-                date = getDate(),
-                time = getTime();
+            /*var day = getDay(),
+                date = getDate(), */
+              var time = getTime();
 
             var updates = {};
-            updates[dateConcat(day, date, time)] = imageData; // Creates new branch called imageDatas
+          //  updates[dateConcat(day, date, time)] = imageData; // Creates new branch called imageDatas
+            updates[dateConcat(getDate(),time)] = imageData;
             resolve(dbRef.update(updates));
         })
         //return dbRef.update(updates);
@@ -87,7 +87,7 @@ function readAllData(dates) {
         var images = [];
         console.log("IMAGES.LENGTH IS WHAT" + images.length + "\n\n")
         async.each(dates, function(date, callback) { // For Each Date
-          console.log(date);
+            console.log(date);
             getTimeRef(date).then(function(timeRefs) {
                 async.each(timeRefs, function(timeStamp, callback) {
                     var path = getPath(date, timeStamp);
@@ -102,7 +102,7 @@ function readAllData(dates) {
                                 time: timeStamp
                             });
                             console.log(images.length);
-                          //callback(); WAS SUPPOSE TO BE HERE
+                            //callback(); WAS SUPPOSE TO BE HERE
                         })
                     })
                 }, function(err) {
@@ -113,12 +113,40 @@ function readAllData(dates) {
         }, function(err) {
             console.log("Finish iterating!");
             callback(); // temporary here for testing. wasnt here before
-          //  resolve(images); // WAS HERE
+            //  resolve(images); // WAS HERE
         })
         resolve(images);
     });
 }
 
+function readData(date) {
+    return new Promise(function(resolve, reject) {
+        var images = [];
+        getTimeRef(date).then(function(timeRefs) {
+            async.each(timeRefs, function(timeStamp, callback) {
+                var path = getPath(date, timeStamp);
+                path.then(function(res) {
+                    db.ref(res).on("value", function(snapshot) {
+                        console.log(timeStamp);
+                        console.log(snapshot.val());
+                        images.push({
+                            name: snapshot.val().imageName,
+                            numOfPeople: snapshot.val().numOfPeople,
+                            url: snapshot.val().imageURL,
+                            time: timeStamp
+                        });
+                        console.log(images.length);
+                        callback();
+                        //callback(); WAS SUPPOSE TO BE HERE
+                    })
+                })
+            }, function(err) {
+                console.log("Finish iterating date\n");
+                resolve();
+            })
+        })
+    })
+}
 
 function getImages(images) {
     images.forEach(function(image) {
@@ -133,13 +161,13 @@ function getPath(date, timeStamp) {
     });
 }
 
-function readData(path) {
+/*function readData(path) {
     db.ref(path).on("value", function(snapshot) {
         console.log(snapshot.val());
     }, function(errorObject) {
         console.log("Read failed:" + errorObject.code);
     });
-}
+} */
 
 function displayAllData() {
     testRef.on("value", function(snapshot) {
@@ -147,14 +175,14 @@ function displayAllData() {
     });
 }
 
-function readData() {
+/*function readData() {
     timeRef.on("value", function(snapshot) {
         console.log(snapshot.val());
     }, function(errorObject) {
         console.log("Read failed:" + errorObject.code);
         // Now we have both childs, try iterating through and getting only the key for each of them.
     });
-}
+} */
 
 
 
@@ -209,7 +237,7 @@ function getTimeRef(date) {
 
 function initDates() {
     return new Promise(function(resolve, reject) {
-      var dates = []; // MAKE THE DATE EMPTY FIRST. TRY IT.
+        var dates = []; // MAKE THE DATE EMPTY FIRST. TRY IT.
         dbRef.on("value", function(snapshot) {
             var info = snapshot.val();
             for (var key in info) {
@@ -242,7 +270,7 @@ function promptUser() {
 
 
 // -------- Moment Functions ---------- //
-function getDayDate() {
+/*function getDayDate() {
     return getDay() + ' ' + getDate();
 }
 
@@ -252,14 +280,28 @@ function getDate() {
 
 function getDay() {
     return moment().format('dddd');
-}
+} */
 
 function getTime() {
     return moment().format("HH:mm");
 }
 
-function dateConcat(day, date, time) {
+/*function dateConcat(day, date, time) {
     return day + ' ' + date + ' /' + time;
+} */
+
+function dateConcat(date, time) {
+  return date + '/' + time;
+}
+
+function getDate() {
+  return moment().format('dddd MMMM D, YYYY');
+}
+
+function parseDate(date) {
+  var parsedDate =  moment(date, "MM-DD-YYYY").format('dddd MMMM D, YYYY');
+  console.log(parsedDate);
+  return parsedDate;
 }
 
 
@@ -269,7 +311,7 @@ function getNumberOfPeople() {
     return numOfPeople;
 }
 
-function getAvgNum(counter, numOfPeople) {
+function getAvgNum(numOfPeople, counter) {
     return numOfPeople / counter;
 }
 
@@ -293,21 +335,26 @@ function humanCounter() {
                 countPeople(res, function(faces) {
                     var numOfPeople = faces.length;
                     console.log('Found ' + numOfPeople + ' face');
-                    writeImageData(numOfPeople,res,getPublicUrl(res));
+                    writeImageData(getAvgNum(numOfPeople,numOfCounters), numOfCounters, res, getPublicUrl(res));
                     resolve(res);
                 })
             })
         }).then(function(res) {
             uploadImage(res)
-        })
-        .then(function() {
-          initDates().then(function(dates){
-            return readAllData(dates)
         }).then(function() {
-          console.log("NEXT\n\n\n\n")
+            readData("Thursday July 28, 2016")
+            .then(function() {
+            parseDate("10-10-2016");
             humanCounter();
         })
       })
+      /*  .then(function() {
+            initDates().then(function(dates) {
+                return readAllData(dates)
+            }).then(function() {
+                humanCounter();
+            })
+        }) */
 }
 // TODO: Prompt then process the image. Loop the process non stop.
 
@@ -336,15 +383,15 @@ exports.main = main;
 
 module.exports = {
 
-  getImageData: function() {
-      return new Promise(function(resolve) {
-          initDates().then(function() {
-              return readAllData()
-          }).then(function(images) {
-              resolve(images)
-          })
-      })
-  },
+    getImageData: function() {
+        return new Promise(function(resolve) {
+            initDates().then(function() {
+                return readAllData()
+            }).then(function(images) {
+                resolve(images)
+            })
+        })
+    },
 
     uploadImage1: function() {
         return new Promise(function(resolve) {
@@ -357,10 +404,14 @@ module.exports = {
 
     writeData: function(numOfPeople, imageName, imageUrl) {
         return new Promise(function(resolve) {
-            writeImageData(numOfPeople, imageName, imageUrl).then(function(){
-            resolve();
-          })
+            writeImageData(numOfPeople, imageName, imageUrl).then(function() {
+                resolve();
+            })
         })
+    },
+
+    getDates: function() {
+      return initDates();
     }
 }
 
