@@ -27,7 +27,7 @@ var routes = function(vision) {
     });
 
     router.post('/upload', function(req, res) {
-        vision.writeData(10,5,6).then(function() {
+        vision.writeData(10, 5, 6).then(function() {
             vision.getImageData().then(function(images) {
                 res.render('index', {
                     images: images
@@ -35,6 +35,16 @@ var routes = function(vision) {
             });
         });
     });
+
+    router.post('/results', function(req, res) {
+        vision.viewSpecificDate(req.body.date).then(function(images) {
+            res.render('results', {
+                images: images,
+                date: req.body.date
+            });
+        });
+    });
+
     return router;
 };
 

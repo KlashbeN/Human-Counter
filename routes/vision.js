@@ -85,7 +85,6 @@ function writeImageData(numOfPeople, numOfCounters, imageName, imageURL) {
 function readAllData(dates) {
     return new Promise(function(resolve, reject) {
         var images = [];
-        console.log("IMAGES.LENGTH IS WHAT" + images.length + "\n\n")
         async.each(dates, function(date, callback) { // For Each Date
             console.log(date);
             getTimeRef(date).then(function(timeRefs) {
@@ -122,6 +121,7 @@ function readAllData(dates) {
 function readData(date) {
     return new Promise(function(resolve, reject) {
         var images = [];
+        console.log(date);
         getTimeRef(date).then(function(timeRefs) {
             async.each(timeRefs, function(timeStamp, callback) {
                 var path = getPath(date, timeStamp);
@@ -142,7 +142,7 @@ function readData(date) {
                 })
             }, function(err) {
                 console.log("Finish iterating date\n");
-                resolve();
+                resolve(images);
             })
         })
     })
@@ -344,7 +344,6 @@ function humanCounter() {
         }).then(function() {
             readData("Thursday July 28, 2016")
             .then(function() {
-            parseDate("10-10-2016");
             humanCounter();
         })
       })
@@ -385,8 +384,8 @@ module.exports = {
 
     getImageData: function() {
         return new Promise(function(resolve) {
-            initDates().then(function() {
-                return readAllData()
+            initDates().then(function(dates) {
+                return readAllData(dates)
             }).then(function(images) {
                 resolve(images)
             })
@@ -410,9 +409,18 @@ module.exports = {
         })
     },
 
-    getDates: function() {
+    getListOfDates: function() {
       return initDates();
-    }
+    },
+
+    viewSpecificDate: function(date) {
+      return new Promise(function(resolve) {
+        readData(parseDate(date)).then(function(images) {
+          console.log(images.length + "Length of images");
+          resolve(images);
+        })
+    })
+  }
 }
 
 if (module == require.main) {

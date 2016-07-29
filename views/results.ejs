@@ -1,5 +1,3 @@
-<!-- views/pages/index.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -13,16 +11,6 @@
         <header>
             <% include header %>
         </header>
-        <script src="https://www.gstatic.com/firebasejs/3.2.0/firebase.js"></script>
-        <script>
-            // Initialize Firebase
-            var config = {
-                apiKey: "AIzaSyAmZB2B45FM36JryBmop4qd26I_AVyqf3g",
-                authDomain: "vision-recognition-1338.firebaseapp.com",
-                databaseURL: "https://vision-recognition-1338.firebaseio.com",
-                storageBucket: "vision-recognition-1338.appspot.com"
-            };
-        </script>
 
         <main>
             <div class="row">
@@ -32,46 +20,27 @@
                         <p>Vision Recognition</p>
 
                         <form action="/results" form method="POST">
-                            <div class="form-result">
+                            <div class="form-group">
                                 Enter a date in MMDDYY:
                                 <input type="text" id="date" name="date"><br>
                             </div>
-                            <div class="form-result">
+                            <div class="form-group">
                                 <input type="submit" value="View"><br>
                             </div>
-                          </form>
-                        <form action="/update/counter" form method="POST">
-                            <div class="form-group">
-                                Number of service counter:
-                                <input type="text" id="numOfCounter" name="numOfCounter"><br>
-                            </div>
-                            <div class="form-group">
-                                <input type="submit" value="Submit"><br>
-                            </div>
                         </form>
-                        <form action="/upload" form method="POST">
-                            <div class="form-image">
-                                <input type="file" id="file" name="file" accept="image/jpg, image/png">
-                            </div>
-                            <div class="form-image">
-                                <input type="submit" value="Upload"><br>
-                                <br>
-                            </div>
-                        </form>
-
-                        <ul class ="list-inline">
+                        <h3> Viewing data for <%=date%> </h3>
+                        <ul class="list-inline">
                             <% images.forEach(function(image) { %>
                                 <li>
                                   <img src='<%= image.url %>' class='img-thumbnail' style="width:246px;height:246px;"/>
-                                    <br>
-                                    <strong><%=image.name %></strong><br>
+                                  <br>
+                                    <strong><%=image.name %></strong>
                                     There are
                                     <%= image.numOfPeople %>
                                     people in the image at<br>
                                     <%= image.time %><br></li>
-
                             <% }); %>
-                          </ul>
+                        </ul>
                     </div>
                 </div>
             </div>
