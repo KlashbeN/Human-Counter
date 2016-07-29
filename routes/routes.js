@@ -1,7 +1,8 @@
 'use strict';
 
 var express = require('express'),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    moment = require('moment');
 
 
 var router = express.Router();
@@ -40,7 +41,7 @@ var routes = function(vision) {
         vision.viewSpecificDate(req.body.date).then(function(images) {
             res.render('results', {
                 images: images,
-                date: req.body.date
+                date: vision.formatDate(req.body.date)
             });
         });
     });

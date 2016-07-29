@@ -28,8 +28,10 @@
                                 <input type="submit" value="View"><br>
                             </div>
                         </form>
-                        <h3> Viewing data for <%=date%> </h3>
+
                         <ul class="list-inline">
+                          <% if (images.length >0) { %>
+                            <h3> Viewing data for <%=date%> </h3>
                             <% images.forEach(function(image) { %>
                                 <li>
                                   <img src='<%= image.url %>' class='img-thumbnail' style="width:246px;height:246px;"/>
@@ -40,6 +42,9 @@
                                     people in the image at<br>
                                     <%= image.time %><br></li>
                             <% }); %>
+                            <% } else { %>
+                              <h2> No data available for <%=date%></h2>
+                              <% } %>
                         </ul>
                     </div>
                 </div>

@@ -65,11 +65,11 @@ function writeImageData(numOfPeople, numOfCounters, imageName, imageURL) {
             //Update the database with the image data
             /*var day = getDay(),
                 date = getDate(), */
-              var time = getTime();
+            var time = getTime();
 
             var updates = {};
-          //  updates[dateConcat(day, date, time)] = imageData; // Creates new branch called imageDatas
-            updates[dateConcat(getDate(),time)] = imageData;
+            //  updates[dateConcat(day, date, time)] = imageData; // Creates new branch called imageDatas
+            updates[dateConcat(getDate(), time)] = imageData;
             resolve(dbRef.update(updates));
         })
         //return dbRef.update(updates);
@@ -291,17 +291,17 @@ function getTime() {
 } */
 
 function dateConcat(date, time) {
-  return date + '/' + time;
+    return date + '/' + time;
 }
 
 function getDate() {
-  return moment().format('dddd MMMM D, YYYY');
+    return moment().format('dddd MMMM D, YYYY');
 }
 
 function parseDate(date) {
-  var parsedDate =  moment(date, "MM-DD-YYYY").format('dddd MMMM D, YYYY');
-  console.log(parsedDate);
-  return parsedDate;
+    var parsedDate = moment(date, "MM-DD-YYYY").format('dddd MMMM D, YYYY');
+    console.log(parsedDate);
+    return parsedDate;
 }
 
 
@@ -335,7 +335,7 @@ function humanCounter() {
                 countPeople(res, function(faces) {
                     var numOfPeople = faces.length;
                     console.log('Found ' + numOfPeople + ' face');
-                    writeImageData(getAvgNum(numOfPeople,numOfCounters), numOfCounters, res, getPublicUrl(res));
+                    writeImageData(getAvgNum(numOfPeople, numOfCounters), numOfCounters, res, getPublicUrl(res));
                     resolve(res);
                 })
             })
@@ -343,17 +343,17 @@ function humanCounter() {
             uploadImage(res)
         }).then(function() {
             readData("Thursday July 28, 2016")
-            .then(function() {
-            humanCounter();
+                .then(function() {
+                    humanCounter();
+                })
         })
-      })
-      /*  .then(function() {
-            initDates().then(function(dates) {
-                return readAllData(dates)
-            }).then(function() {
-                humanCounter();
-            })
-        }) */
+        /*  .then(function() {
+              initDates().then(function(dates) {
+                  return readAllData(dates)
+              }).then(function() {
+                  humanCounter();
+              })
+          }) */
 }
 // TODO: Prompt then process the image. Loop the process non stop.
 
@@ -409,20 +409,21 @@ module.exports = {
         })
     },
 
-    getListOfDates: function() {
-      return initDates();
+    viewSpecificDate: function(date) {
+        return new Promise(function(resolve) {
+            readData(parseDate(date)).then(function(images) {
+                console.log(images.length + "Length of images");
+                resolve(images);
+            })
+        })
     },
 
-    viewSpecificDate: function(date) {
-      return new Promise(function(resolve) {
-        readData(parseDate(date)).then(function(images) {
-          console.log(images.length + "Length of images");
-          resolve(images);
-        })
-    })
-  }
-}
+    formatDate: function(date) {
+        return moment(date, "MM-DD-YYYY").format('dddd MMMM D, YYYY');
+    }
 
+
+}
 if (module == require.main) {
     var photo = process.argv[2];
     exports.main();
