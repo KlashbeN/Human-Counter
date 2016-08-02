@@ -25,33 +25,26 @@ var bodyParser = require('body-parser');
 
 //var session = require('cookie-session');
 
-//var config = require('./config');
+var config = require('./config');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine' , 'ejs');
 
-/*app.get('/' , function(req, res) {
-	vision.getImageData().then(function(images) {
-	res.render('index' , {
-		images: images
-	});
-});
-}); */
-
-/*app.use(session({
+/*
+app.use(session({
   secret: config.secret,
   signed: true
-})); */
+}));
 
-/*
+
 var oauth2 = require('./routes/oauth2')(config.oauth2);
 app.use(oauth2.router);
 app.use(oauth2.aware);
 app.use(oauth2.template);
-*/
 
+*/
 // Configure routes
 
 app.use('/', require('./routes/routes')(

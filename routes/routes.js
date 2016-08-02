@@ -1,9 +1,21 @@
 'use strict';
 
 var express = require('express'),
-    bodyParser = require('body-parser'),
-    moment = require('moment');
+    moment = require('moment'),
+    multer = require('multer'),
+    path = require('path');
 
+
+var options = multer.diskStorage({
+  destination: 'uploads/',
+  filename: function(req,file,cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+var storage = multer.memoryStorage();
+
+var uploadImg = multer({storage: storage})
 
 var router = express.Router();
 
@@ -27,15 +39,35 @@ var routes = function(vision) {
         });
     });
 
-    router.post('/upload', function(req, res) {
-        vision.writeData(10, 5, 6).then(function() {
+  /*  router.post('/upload', uploadImg.single('img'),vision.uploadToBucket, function(req, res) {
+      console.log(req.file + "THIS IS THE FILENAME");
+        vision.uploadImage1(req.file).then(function() {
             vision.getImageData().then(function(images) {
                 res.render('index', {
                     images: images
                 });
             });
         });
+    }); */
+
+    router.post('/upload', uploadImg.single('img'),vision.uploadToBucket,function(req, res) {
+      console.log("THIS IS THE FILE: ", req.file);
+          vision.visionProcess(req.file.cloudStoragePublicUrl).then(function() {
+            vision.getImageData().then(function(images) {
+                res.render('index', {
+                    images: images
+                });
+            });
+          });
     });
+
+    /*    router.post('/upload', uploadImg.single('img'), function(req, res, next) {
+            vision.imageResize(req.file).then(function(images) {
+                res.render('index', {
+                    images: images
+                });
+            });
+        }); */
 
     router.post('/results', function(req, res) {
         vision.viewSpecificDate(req.body.date).then(function(images) {

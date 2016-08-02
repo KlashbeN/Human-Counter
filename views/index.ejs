@@ -51,9 +51,9 @@
                             </div>
                         </form>
 
-                        <form action="/upload" form method="POST">
+                        <form action="/upload" form method="POST" enctype = "multipart/form-data">
                             <div class="form-image">
-                                <input type="file" id="file" name="file" accept="image/jpg, image/png">
+                                <input type="file" name="img" id="img">
                             </div>
                             <div class="form-image">
                                 <input type="submit" value="Upload"><br>
@@ -72,7 +72,6 @@
                                     <%= image.numOfPeople %>
                                     people in the image at<br>
                                     <%= image.time %><br></li>
-
                             <% }); %>
                             <% } else { %>
                               <h2>No data available</h2>

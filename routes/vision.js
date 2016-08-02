@@ -6,7 +6,8 @@ var firebase = require("firebase"),
     moment = require('moment'),
     promise = require('promise'),
     async = require('async'),
-    prompt = require('prompt');
+    prompt = require('prompt'),
+    config = require('../config');
 
 var ejs = require('ejs'),
     read = fs.readFileSync,
@@ -15,7 +16,7 @@ var ejs = require('ejs'),
 
 var gcloud = require('gcloud')({
     projectId: 'vision-recognition-1338',
-    keyFilename: 'keyfile.json'
+    credentials: require('./keyfile.json')
 });
 
 var CLOUD_BUCKET = 'vision-recognition-1338.appspot.com';
@@ -47,8 +48,8 @@ var db = firebase.database(),
     dbRef = db.ref(DBNAME),
     testRef = db.ref(DBNAME + "Monday July 4, 2016 " + "/09:57");
 
-var image = 'demo2.jpg',
-    numOfCounters = 1;
+//var image = 'demo2.jpg';
+var numOfCounters = 1;
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -92,15 +93,15 @@ function readAllData(dates) {
                     var path = getPath(date, timeStamp);
                     path.then(function(res) {
                         db.ref(res).on("value", function(snapshot) {
-                            console.log(timeStamp);
-                            console.log(snapshot.val());
+                            //    console.log(timeStamp);
+                            //  console.log(snapshot.val());
                             images.push({
                                 name: snapshot.val().imageName,
                                 numOfPeople: snapshot.val().numOfPeople,
                                 url: snapshot.val().imageURL,
                                 time: timeStamp
                             });
-                            console.log(images.length);
+                            //console.log(images.length);
                             //callback(); WAS SUPPOSE TO BE HERE
                         })
                     })
@@ -127,15 +128,15 @@ function readData(date) {
                 var path = getPath(date, timeStamp);
                 path.then(function(res) {
                     db.ref(res).on("value", function(snapshot) {
-                        console.log(timeStamp);
-                        console.log(snapshot.val());
+                        //  console.log(timeStamp);
+                        //  console.log(snapshot.val());
                         images.push({
                             name: snapshot.val().imageName,
                             numOfPeople: snapshot.val().numOfPeople,
                             url: snapshot.val().imageURL,
                             time: timeStamp
                         });
-                        console.log(images.length);
+                        //  console.log(images.length);
                         callback();
                         //callback(); WAS SUPPOSE TO BE HERE
                     })
@@ -161,29 +162,11 @@ function getPath(date, timeStamp) {
     });
 }
 
-/*function readData(path) {
-    db.ref(path).on("value", function(snapshot) {
-        console.log(snapshot.val());
-    }, function(errorObject) {
-        console.log("Read failed:" + errorObject.code);
-    });
-} */
-
 function displayAllData() {
     testRef.on("value", function(snapshot) {
         console.log(snapshot.val());
     });
 }
-
-/*function readData() {
-    timeRef.on("value", function(snapshot) {
-        console.log(snapshot.val());
-    }, function(errorObject) {
-        console.log("Read failed:" + errorObject.code);
-        // Now we have both childs, try iterating through and getting only the key for each of them.
-    });
-} */
-
 
 
 //-------------------------Google Cloud Functions----------------------------//
@@ -198,8 +181,10 @@ function countPeople(image, callback) {
 
 function uploadImage(image) {
     return new Promise(function(resolve, reject) {
+        console.log("IN HERE");
         bucket.upload(image, function(err, file) {
             if (!err) {
+                console.log("DONE");
                 resolve();
             }
         });
@@ -315,9 +300,9 @@ function getAvgNum(numOfPeople, counter) {
     return numOfPeople / counter;
 }
 
-function getPublicUrl(image) {
+function getPublicUrl(filename) {
     return 'https://storage.googleapis.com/' +
-        CLOUD_BUCKET + '/' + image;
+        CLOUD_BUCKET + '/' + filename;
 }
 
 // Returns the Google Cloud Storage object URI.
@@ -392,10 +377,10 @@ module.exports = {
         })
     },
 
-    uploadImage1: function() {
+    uploadImage1: function(image) {
         return new Promise(function(resolve) {
             console.log("I am trying to upload");
-            retrieveImage().then(function() {
+            uploadImage(image).then(function() {
                 resolve();
             })
         })
@@ -420,8 +405,60 @@ module.exports = {
 
     formatDate: function(date) {
         return moment(date, "MM-DD-YYYY").format('dddd MMMM D, YYYY');
-    }
+    },
 
+    imageResize: function(image) {
+        return new Promise(function(resolve) {
+            gm(image).resizeExact(640, 480).write(image, function(err) {
+                if (!err) {
+                    console.log('done resizing')
+                    resolve(image);
+                } else {
+                    console.log("empty");
+                }
+            });
+        })
+    },
+
+    uploadToBucket: function(req, res, next) {
+        console.log("FILENAME", req.file);
+        if (!req.file) {
+            next();
+        }
+
+        var gcsname = moment() + req.file.originalname;
+        console.log(gcsname);
+        var file = bucket.file(gcsname);
+        var stream = file.createWriteStream();
+
+        stream.on('error', function(err) {
+            req.file.cloudStorageError = err;
+            next(err);
+        });
+
+        stream.on('finish', function() {
+            req.file.cloudStorageObject = gcsname;
+            req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
+            req.file.cloudStorageUri = getStorageUri(gcsname);
+            next();
+        });
+
+        stream.end(req.file.buffer);
+
+    },
+
+    visionProcess: function(image) {
+        return new Promise(function(resolve) {
+            console.log("HELLO I AM HERE");
+            countPeople(image, function(faces) {
+              console.log(image);
+                var numOfPeople = faces.length;
+                console.log('Found ' + numOfPeople + ' face');
+                resolve();
+                writeImageData(getAvgNum(numOfPeople, numOfCounters), numOfCounters, 'image', getPublicUrl('image'));
+            });
+        });
+    }
 
 }
 if (module == require.main) {
