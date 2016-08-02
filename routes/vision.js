@@ -7,7 +7,8 @@ var firebase = require("firebase"),
     promise = require('promise'),
     async = require('async'),
     prompt = require('prompt'),
-    config = require('../config');
+    config = require('../config'),
+    unirest = require('unirest');
 
 var ejs = require('ejs'),
     read = fs.readFileSync,
@@ -21,6 +22,7 @@ var gcloud = require('gcloud')({
 
 var CLOUD_BUCKET = 'vision-recognition-1338.appspot.com';
 var DBNAME = 'imageDatas/';
+var GOOGLE_VISION_API_URL = 'https://vision.googleapis.com/v1/images:annotate?key=' + config.gcloudVision.key;
 
 var vision = gcloud.vision(),
     gcs = gcloud.storage(),
@@ -35,8 +37,7 @@ var vision = gcloud.vision(),
 firebase.initializeApp({
     serviceAccount: {
         projectId: 'vision-recognition-1338',
-        privateKey: '-----BEGIN PRIVATE KEY-----\n' +
-            'MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCN/Z+/GVV6RvdC\nB9/pCcqJvc6U4w89mbdIFcJ+L9oOhwm0M0R2CzshrVu9+ox0UKiZY9Ph4X2snUIU\n+EPg7Dm86kxDwoe0JrpFTxdLgnuXsOwokiJWx8CFAl+ma0AtrzJdmHlTTnKJnLMB\n9Y4BEKi7PiUDFGFrnajVK5KvFzd/wgfzt+YExr4VUahscuT7s9Rk86b0CpVyKTmF\nByrq9zE9v2U4LN5Thmi/2roGuPgiLJLPbR480EuW2wOn0gXZzELZlW9FS7HBQqE2\nt4El/F6/NUZcKl9THuEcFgiQOMn0PAxSHXlHbBk1iMc+w2mYe6E8g0BrZ+bSCVXG\ng5uSiaIZAgMBAAECggEAP68rgPiJ4AgISjNh+BGOJ+1bxGd6pHRXQhuQWix4Lt/e\nOFZuNEuhP9+TMEg5ysmKdRHTLJKIXW1DAEjBmRYaZ2LmxdVwLBranM92cUWazVRq\n919jy2xYKs//upKL/HGBs3z5naWntZT0rMJH6K5iH2kmDJWNhEj4OnQKnEFbgQ8I\nffEnRwwd60xTwXiieLz5n+qC5iMnMKrLRauQfxIiqmDD8i9pJJ3c96/LtsibxbNq\n9ZYhnii1SMNnmcLTL47ppu/tWHrzRlil33DIMWFO8zN4WqZo3EGIHs78B5rW/9J+\nPuzVWZKjf2URBUW9tQPm9jngAdnOGe2eEKtnE8IxAQKBgQDGStL/+T2WdNi0jew0\n8CmnVaDgWhi/9Cos4DYRmgvlBMuDiAzQPEVaLg0452Qw/dseDtiF6ngQ9EVnitm5\n2K5L2qAya/y9CY6HS1mzv0AVgTEJ0pqLsBV3LhJi6hAjYSuyxOov/rD+rAY77xSr\n45I9XAUDMbo5L4c2ABzaN6bbCQKBgQC3UDgzZiJ/wJKZ1aySzgouevxs0hWHxbVe\nnIA5JtAlAkfn3QA8vMYIlNyciLpSskTN8Zqlavi6Z5CAxfplcxFyokcVuSsuL/qk\n9Aj+qNNhU9+FqMTnu2bg19A82qaQXC66JG+arWSBwk6L2SkLnPbxI9ffckXYzNrs\nfgyrPaWCkQKBgB8HMFMrng6ABDTkjFSQTARKKt1QW9UVkM/q2asRbtEMWggf7tla\nxQNid2EzHANqhbIDYrA5y0Xj40RbfsxM8qEd+blKGoc+CpZzHPs6bv2udIzz7ojz\nKbi3ddsSgyn2F49mrrqJ4QpIwsT4GUT4XDbLwmEIk/pEzKSPifQ/hxV5AoGAaBAu\nF1+frg5QKuxV73Dv7rr6mXwZpN3jvDXzxH34I0pML6ASBmjTswNuyZ4Ex/VTgeXp\n+IXldUxdh/zbzMOp3/2nhPl9PdcW3pV6lbaZaOMIPQQ146dLG9Dn8ePeMo1iKWGN\nya0tJUx88n7xAhq1ROcoITzp0c1Zam+UGZIBZ0ECgYAmBxMaesHsyKqBikp0oKA4\noSwvO/rh3uryZ4zKQ3wzUIQokJAfOKbK6FXyDREyYzlqPy1zCUSyf1R48JEq1e3/\nICyZG4iGY2BeTGjzYuW/bkuVM0xI3rleJTpib/zbIstEqE0Ay6dyZFqd/JZSssm7\nSEQMN2x+8IsmhtBNaUfOFQ==\n-----END PRIVATE KEY-----\n',
+        privateKey: config.firebase.pKey,
         clientEmail: 'vision-firebase@vision-recognition-1338.iam.gserviceaccount.com'
     },
     databaseURL: 'https://vision-recognition-1338.firebaseio.com/'
@@ -87,7 +88,6 @@ function readAllData(dates) {
     return new Promise(function(resolve, reject) {
         var images = [];
         async.each(dates, function(date, callback) { // For Each Date
-            console.log(date);
             getTimeRef(date).then(function(timeRefs) {
                 async.each(timeRefs, function(timeStamp, callback) {
                     var path = getPath(date, timeStamp);
@@ -106,12 +106,12 @@ function readAllData(dates) {
                         })
                     })
                 }, function(err) {
-                    console.log("Finish iterating times \n");
+                    //  console.log("Finish iterating times \n");
                     callback();
                 })
             })
         }, function(err) {
-            console.log("Finish iterating!");
+            //console.log("Finish iterating!");
             callback(); // temporary here for testing. wasnt here before
             //  resolve(images); // WAS HERE
         })
@@ -421,13 +421,11 @@ module.exports = {
     },
 
     uploadToBucket: function(req, res, next) {
-        console.log("FILENAME", req.file);
         if (!req.file) {
             next();
         }
 
         var gcsname = moment() + req.file.originalname;
-        console.log(gcsname);
         var file = bucket.file(gcsname);
         var stream = file.createWriteStream();
 
@@ -447,19 +445,58 @@ module.exports = {
 
     },
 
-    visionProcess: function(image) {
+   visionProcess: function(image) {
         return new Promise(function(resolve) {
             console.log("HELLO I AM HERE");
             countPeople(image, function(faces) {
-              console.log(image);
+                console.log(image);
                 var numOfPeople = faces.length;
                 console.log('Found ' + numOfPeople + ' face');
-                resolve();
-                writeImageData(getAvgNum(numOfPeople, numOfCounters), numOfCounters, 'image', getPublicUrl('image'));
+                resolve(numOfPeople);
             });
         });
-    }
+    },
 
+  /*  base64encode: function(file) {
+        return new Promise(function(resolve) {
+            var raw = new Buffer(file.buffer.toString(), 'base64');
+            return raw;
+          }).then(function(raw) {
+            console.log("FILE IS HERE AND FINE",raw)
+              resolve(raw);
+        })
+    } */
+
+    /*  visionProcess: function(cloudStorageUri, callback) {
+          return new Promise(function(resolve) {
+            console.log(cloudStorageUri);
+              var body = {
+                  "requests": [{
+                      "image": {
+                          "source": {
+                              "gcsImageUri": cloudStorageUri,
+                          }
+                      },
+                      "features": [{
+                          "type": "FACE_DETECTION",
+                          "maxResults": 1
+                      }]
+                  }]
+              }
+
+              console.log("DONE");
+              unirest.post(GOOGLE_VISION_API_URL)
+                  .header({
+                      'Content-Type': 'application/json'
+                  })
+                  .send(body)
+                  .end(function(response) {
+                      console.log(JSON.stringify(response.body.responses));
+                      writeImageData(JSON.stringify(response.body.responses),0,0,0);
+                  });
+              resolve();
+          });
+      } */
 }
 if (module == require.main) {
     var photo = process.argv[2];
