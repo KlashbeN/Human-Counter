@@ -30,20 +30,22 @@
                         </form>
 
                         <ul class="list-inline">
-                                <li>
-                                  <img src='<%= images.url %>' class='img-thumbnail'/>
-                                  <br>
-                                    <strong><%=images.name %></strong>
-                                    There are
-                                    <%= images.numOfPeople %>
-                                    people in the image.<br>
-                                    <%= images.numOfCounters %>
-                                    <% if(images.numOfCounters>1){ %>
-                                      counters opened for service.
-                                     <% } else { %>
-                                  counter opened for service. <% } %>
-                                    <br>
-                                    At <%= images.time %><br></li>
+                            <li>
+                                <img src='<%= images.url %>' class='img-thumbnail'/>
+                                <br>
+                                <strong><%=images.name %></strong>
+                                There are
+                                <%= images.numOfPeople %>
+                                people in the image.<br>
+                                <%= images.numOfCounters %>
+                                <% if(images.numOfCounters>1){ %>
+                                    counters opened for service.
+                                <% } else { %>
+                                    counter opened for service.
+                                <% } %>
+                                <br>
+                                At
+                                <%= images.time %><br></li>
                         </ul>
                     </div>
                 </div>
