@@ -487,7 +487,8 @@ module.exports = {
                   numOfPeople: numOfPeople,
                   numOfCounters: numOfCounters,
                   name: image.cloudStorageObject,
-                  url: getPublicUrl(image.cloudStorageObject)
+                  url: getPublicUrl(image.cloudStorageObject),
+                  time: moment().format('LT')
                 };
                 resolve(imageData);
               })
@@ -502,6 +503,13 @@ module.exports = {
                 console.log("Title: " + newPost.numOfPeople);
             });
         });
+    },
+
+    updateCounters: function( number) {
+      return new Promise(function(resolve) {
+      numOfCounters = number;
+      resolve();
+    });
     }
 
 

@@ -32,10 +32,12 @@ var routes = function(vision) {
 
     router.post('/update/counter', function(req, res) { // Be sure to use the correct action
         console.log("NUMBER" + req.body.numOfCounter);
+        vision.updateCounters(req.body.numOfCounter).then(function() {
         vision.getImageData().then(function(images) {
             res.render('index', {
                 images: images
             });
+          });
         });
     });
 
