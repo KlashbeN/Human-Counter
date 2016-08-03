@@ -51,14 +51,11 @@ var routes = function(vision) {
     }); */
 
     router.post('/upload', uploadImg.single('img'),vision.uploadToBucket,function(req, res) {
-      console.log("THIS IS THE FILE: ", req.file);
-          vision.visionProcess(req.file.cloudStoragePublicUrl).then(function() {
-            vision.getImageData().then(function(images) {
-                res.render('index', {
+          return vision.visionProcess(req.file).then(function(images) {
+                res.render('result', {
                     images: images
                 });
             });
-          });
     });
 
     /*    router.post('/upload', uploadImg.single('img'), function(req, res, next) {
