@@ -23,8 +23,9 @@
                 storageBucket: "vision-recognition-1338.appspot.com"
             };
         </script>
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.js"></script>
 
-        <main>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="jumbotron">
@@ -35,11 +36,17 @@
                             <div class="form-result">
                                 Enter a date in MMDDYY:
                                 <input type="text" id="date" name="date"><br>
+                                <script>
+                                    $(document).ready(function() {
+                                        $('#chooseDate').datepicker({format: "mm/dd/yyyy", calendarWeeks: true});
+                                    });
+                                </script>
+                                <input type="text" id="chooseDate" id="date-select" name="date2">
                             </div>
                             <div class="form-result">
                                 <input type="submit" value="View"><br>
                             </div>
-                          </form>
+                        </form>
 
                         <form action="/update/counter" form method="POST">
                             <div class="form-group">
@@ -51,7 +58,7 @@
                             </div>
                         </form>
 
-                        <form action="/upload" form method="POST" enctype = "multipart/form-data">
+                        <form action="/upload" form method="POST" enctype="multipart/form-data">
                             <div class="form-image">
                                 <input type="file" name="img" id="img">
                             </div>
@@ -61,22 +68,22 @@
                             </div>
                         </form>
 
-                        <ul class ="list-inline">
-                          <% if (images.length > 0) { %>
-                            <% images.forEach(function(image) { %>
-                                <li>
-                                  <img src='<%= image.url %>' class='img-thumbnail' style="width:246px;height:246px;"/>
-                                    <br>
-                                    <strong><%=image.name %></strong><br>
-                                    There are
-                                    <%= image.numOfPeople %>
-                                    people in the image at<br>
-                                    <%= image.time %><br></li>
-                            <% }); %>
+                        <ul class="list-inline">
+                            <% if (images.length > 0) { %>
+                                <% images.forEach(function(image) { %>
+                                    <li>
+                                        <img src='<%= image.url %>' class='img-thumbnail' style="width:246px;height:246px;"/>
+                                        <br>
+                                        <strong><%=image.name %></strong><br>
+                                        There are
+                                        <%= image.numOfPeople %>
+                                        people in the image at<br>
+                                        <%= image.time %><br></li>
+                                <% }); %>
                             <% } else { %>
-                              <h2>No data available</h2>
-                              <% } %>
-                          </ul>
+                                <h2>No data available</h2>
+                            <% } %>
+                        </ul>
                     </div>
                 </div>
             </div>

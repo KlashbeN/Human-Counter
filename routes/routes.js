@@ -69,10 +69,11 @@ var routes = function(vision) {
         }); */
 
     router.post('/results', function(req, res) {
-        vision.viewSpecificDate(req.body.date).then(function(images) {
+      console.log(req.body.date2);
+        vision.viewSpecificDate(req.body.date2).then(function(images) {
             res.render('results', {
                 images: images,
-                date: vision.formatDate(req.body.date)
+                date: vision.formatDate(req.body.date2)
             });
         });
     });

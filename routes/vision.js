@@ -3,7 +3,7 @@
 var firebase = require("firebase"),
     fs = require('fs'),
     gm = require('gm'),
-    moment = require('moment'),
+    moment = require('moment-timezone'),
     promise = require('promise'),
     async = require('async'),
     prompt = require('prompt'),
@@ -45,6 +45,7 @@ var db = firebase.database(),
 
 //var image = 'demo2.jpg';
 var numOfCounters = 1;
+moment.tz.setDefault('Asia/Singapore');
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -95,7 +96,7 @@ function readAllData(dates) {
                                 name: snapshot.val().imageName,
                                 numOfPeople: snapshot.val().numOfPeople,
                                 url: snapshot.val().imageURL,
-                                time: timeStamp
+                                time: moment(timeStamp, "HH:mm").format('LT')
                             });
                             //console.log(images.length);
                             //callback(); WAS SUPPOSE TO BE HERE
@@ -410,7 +411,7 @@ module.exports = {
     },
 
     formatDate: function(date) {
-        return moment(date, "MM-DD-YYYY").format('dddd MMMM D, YYYY');
+        return moment(date, "MM/DD/YYYY").format('dddd MMMM D, YYYY');
     },
 
     imageResize: function(image) {
@@ -456,9 +457,9 @@ module.exports = {
             countPeople(image.cloudStoragePublicUrl, function(faces) {
                 var numOfPeople = faces.length;
                 console.log('Found ' + numOfPeople + ' face');
-                writeImageData(numOfPeople, numOfCounters, image.cloudStorageObject, getPublicUrl(image.cloudStorageObject))
+                writeImageData(getAvgNum(numOfPeople, numOfCounters), numOfCounters, image.cloudStorageObject, getPublicUrl(image.cloudStorageObject))
                 var imageData = {
-                  numOfPeople: numOfPeople,
+                  numOfPeople: getAvgNum(numOfPeople, numOfCounters),
                   numOfCounters: numOfCounters,
                   name: image.cloudStorageObject,
                   url: getPublicUrl(image.cloudStorageObject),

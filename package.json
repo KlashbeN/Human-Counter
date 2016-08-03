@@ -24,6 +24,7 @@
     "gm": "^1.22.0",
     "googleapis": "^2.1.7",
     "moment": "^2.14.1",
+    "moment-timezone": "0.5.5",
     "promise": "^7.1.1",
     "prompt": "^1.0.0",
     "crypto": "^0.0.3",
