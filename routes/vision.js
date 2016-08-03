@@ -28,12 +28,6 @@ var vision = gcloud.vision(),
     gcs = gcloud.storage(),
     bucket = gcs.bucket(CLOUD_BUCKET);
 
-// Initialize the app with a service account, granting admin privileges
-/*firebase.initializeApp({
-  databaseURL: 'https://vision-recognition-1338.firebaseio.com/',
-  serviceAccount: 'serviceAccountCredentials.json'
-}); */
-
 firebase.initializeApp({
     serviceAccount: {
         projectId: 'vision-recognition-1338',
@@ -457,26 +451,6 @@ module.exports = {
 
     },
 
-  /*  visionProcess: function(image) {
-        return new Promise(function(resolve) {
-            countPeople(image.cloudStoragePublicUrl, function(faces) {
-                var numOfPeople = faces.length;
-                console.log('Found ' + numOfPeople + ' face');
-                writeImageData(numOfPeople, numOfCounters, image.cloudStorageObject, getPublicUrl(image.cloudStorageObject))
-            }).then(function() {
-                return new Promise(function(resolve) {
-                    var imageData = {
-                        numOfPeople: numOfPeople,
-                        numOfCounters: numOfCounters,
-                        imageName: image.cloudStorageObject,
-                        imageURL: getPublicUrl(image.cloudStorageObject)
-                    };
-                    console.log(imageData.length + "LENGTH OF IMAGE");
-                    resolve(imageData);
-                }).then(function(imageData) {resolve(imageData)});
-        })
-    })
-  }, */
   visionProcess: function(image) {
         return new Promise(function(resolve) {
             countPeople(image.cloudStoragePublicUrl, function(faces) {
@@ -511,30 +485,6 @@ module.exports = {
       resolve();
     });
     }
-
-
-
-    /*.then(function() {
-            console.log("Over here?");
-            var data = {
-              numOfPeople: numOfPeople,
-              numOfCounters: numOfCounters,
-              imageName: image.cloudStorageObject,
-              imageURL: getPublicUrl(image.cloudStorageObject)
-            };
-            return data;
-          })
-      }); */
-
-    /*  base64encode: function(file) {
-          return new Promise(function(resolve) {
-              var raw = new Buffer(file.buffer.toString(), 'base64');
-              return raw;
-            }).then(function(raw) {
-              console.log("FILE IS HERE AND FINE",raw)
-                resolve(raw);
-          })
-      } */
 
     /*  visionProcess: function(cloudStorageUri, callback) {
           return new Promise(function(resolve) {
