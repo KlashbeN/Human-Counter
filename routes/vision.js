@@ -95,6 +95,7 @@ function readAllData(dates) {
                             images.push({
                                 name: snapshot.val().imageName,
                                 numOfPeople: snapshot.val().numOfPeople,
+                                numOfCounters: snapshot.val().numOfCounters,
                                 url: snapshot.val().imageURL,
                                 time: moment(timeStamp, "HH:mm").format('LT')
                             });
@@ -130,6 +131,7 @@ function readData(date) {
                         images.push({
                             name: snapshot.val().imageName,
                             numOfPeople: snapshot.val().numOfPeople,
+                            numOfCounters: snapshot.val().numOfCounters,
                             url: snapshot.val().imageURL,
                             time: timeStamp
                         });

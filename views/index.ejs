@@ -23,8 +23,6 @@
                 storageBucket: "vision-recognition-1338.appspot.com"
             };
         </script>
-        <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.js"></script>
 
             <div class="row">
                 <div class="col-lg-12">
@@ -34,17 +32,16 @@
 
                         <form action="/results" form method="POST">
                             <div class="form-result">
-                                Enter a date in MMDDYY:
-                                <input type="text" id="date" name="date"><br>
+                                Select a date to view information<br>
                                 <script>
                                     $(document).ready(function() {
                                         $('#chooseDate').datepicker({format: "mm/dd/yyyy", calendarWeeks: true});
                                     });
                                 </script>
-                                <input type="text" id="chooseDate" id="date-select" name="date2">
+                                <input type="text" id="chooseDate" id="date" name="date">
                             </div>
                             <div class="form-result">
-                                <input type="submit" value="View"><br>
+                                <input type="submit" value="View"><br><br>
                             </div>
                         </form>
 
@@ -52,9 +49,7 @@
                             <div class="form-group">
                                 Number of service counter:
                                 <input type="text" id="numOfCounter" name="numOfCounter">
-                            </div>
-                            <div class="form-group">
-                                <input type="submit" value="Submit"><br>
+                                <input type="submit" value="Update">
                             </div>
                         </form>
 
@@ -77,7 +72,15 @@
                                         <strong><%=image.name %></strong><br>
                                         There are
                                         <%= image.numOfPeople %>
-                                        people in the image at<br>
+                                        people in the image.<br>
+                                        <%= image.numOfCounters %>
+                                        <% if(image.numOfCounters>1){ %>
+                                            counters opened for service.
+                                        <% } else { %>
+                                            counter opened for service.
+                                        <% } %>
+                                        <br>
+                                        At
                                         <%= image.time %><br></li>
                                 <% }); %>
                             <% } else { %>

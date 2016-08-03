@@ -41,17 +41,6 @@ var routes = function(vision) {
         });
     });
 
-  /*  router.post('/upload', uploadImg.single('img'),vision.uploadToBucket, function(req, res) {
-      console.log(req.file + "THIS IS THE FILENAME");
-        vision.uploadImage1(req.file).then(function() {
-            vision.getImageData().then(function(images) {
-                res.render('index', {
-                    images: images
-                });
-            });
-        });
-    }); */
-
     router.post('/upload', uploadImg.single('img'),vision.uploadToBucket,function(req, res) {
           return vision.visionProcess(req.file).then(function(images) {
                 res.render('result', {
@@ -60,20 +49,12 @@ var routes = function(vision) {
             });
     });
 
-    /*    router.post('/upload', uploadImg.single('img'), function(req, res, next) {
-            vision.imageResize(req.file).then(function(images) {
-                res.render('index', {
-                    images: images
-                });
-            });
-        }); */
-
     router.post('/results', function(req, res) {
-      console.log(req.body.date2);
-        vision.viewSpecificDate(req.body.date2).then(function(images) {
+      console.log(req.body.date);
+        vision.viewSpecificDate(req.body.date).then(function(images) {
             res.render('results', {
                 images: images,
-                date: vision.formatDate(req.body.date2)
+                date: vision.formatDate(req.body.date)
             });
         });
     });

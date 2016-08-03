@@ -21,8 +21,13 @@
 
                         <form action="/results" form method="POST">
                             <div class="form-group">
-                                Enter a date in MMDDYY:
-                                <input type="text" id="date" name="date"><br>
+                              Select a date to view information<br>
+                              <script>
+                                  $(document).ready(function() {
+                                      $('#chooseDate').datepicker({format: "mm/dd/yyyy", calendarWeeks: true});
+                                  });
+                              </script>
+                              <input type="text" id="chooseDate" id="date" name="date"><br>
                             </div>
                             <div class="form-group">
                                 <input type="submit" value="View"><br>
@@ -36,10 +41,18 @@
                                 <li>
                                   <img src='<%= image.url %>' class='img-thumbnail' style="width:246px;height:246px;"/>
                                   <br>
-                                    <strong><%=image.name %></strong>
+                                    <strong><%=image.name %></strong><br>
                                     There are
                                     <%= image.numOfPeople %>
-                                    people in the image at<br>
+                                    people in the image<br>
+                                    <%= image.numOfCounters %>
+                                    <% if(image.numOfCounters>1){ %>
+                                        counters opened for service.
+                                    <% } else { %>
+                                        counter opened for service.
+                                    <% } %>
+                                    <br>
+                                    At
                                     <%= image.time %><br></li>
                             <% }); %>
                             <% } else { %>

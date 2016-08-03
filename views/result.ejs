@@ -21,8 +21,13 @@
 
                         <form action="/results" form method="POST">
                             <div class="form-group">
-                                Enter a date in MMDDYY:
-                                <input type="text" id="date" name="date"><br>
+                              Select a date to view information<br>
+                              <script>
+                                  $(document).ready(function() {
+                                      $('#chooseDate').datepicker({format: "mm/dd/yyyy", calendarWeeks: true});
+                                  });
+                              </script>
+                              <input type="text" id="chooseDate" id="date" name="date"><br>
                             </div>
                             <div class="form-group">
                                 <input type="submit" value="View"><br><br>
@@ -33,7 +38,7 @@
                             <li>
                                 <img src='<%= images.url %>' class='img-thumbnail'/>
                                 <br>
-                                <strong><%=images.name %></strong>
+                                <strong><%=images.name %></strong><br>
                                 There are
                                 <%= images.numOfPeople %>
                                 people in the image.<br>
