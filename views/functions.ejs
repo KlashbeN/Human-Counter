@@ -1,0 +1,8 @@
+<%
+getDate = function(image) {
+var date = <%=image.data%>
+var h = document.createElement("H3");
+var t = document.createTextNode(date);
+h.appendChild(t);
+}
+%>

@@ -21,21 +21,42 @@
 
                         <form action="/results" form method="POST">
                             <div class="form-group">
-                              Select a date to view information<br>
-                              <script>
-                                  $(document).ready(function() {
-                                      $('#chooseDate').datepicker({format: "mm/dd/yyyy", calendarWeeks: true});
-                                  });
-                              </script>
-                              <input type="text" id="chooseDate" id="date" name="date"><br>
+                                Select a date to view information<br>
+                                <script>
+                                    $(document).ready(function() {
+                                        $('#chooseDate').datepicker({format: "mm/dd/yyyy", calendarWeeks: true});
+                                    });
+                                </script>
+                                <input type="text" id="chooseDate" id="date" name="date"><br>
                             </div>
                             <div class="form-group">
                                 <input type="submit" value="View"><br><br>
                             </div>
                         </form>
+                        <form action="/update/counter" form method="POST">
+                            <div class="form-group">
+                                Number of service counter:
+                                <input type="text" id="numOfCounter" name="numOfCounter">
+                                <input type="submit" value="Update">
+                            </div>
+                        </form>
+
+                        <form action="/upload" form method="POST" enctype="multipart/form-data">
+                            <div class="form-image">
+                                <input type="file" name="img" id="img" accept=".png, .jpeg, .jpg">
+                            </div>
+                            <div class="form-image">
+                                <input type="submit" value="Upload"><br>
+                                <br>
+                            </div>
+                        </form>
 
                         <ul class="list-inline">
                             <li>
+                                <h3>
+                                    Current waiting time is
+                                    <%=images.waitingTime%>
+                                    minutes</h3>
                                 <img src='<%= images.url %>' class='img-thumbnail'/>
                                 <br>
                                 <strong><%=images.name %></strong><br>

@@ -16,9 +16,10 @@
     "async": "^2.0.0",
     "body-parser": "^1.15.0",
     "chai": "^3.5.0",
-    "cookie-session": "^2.0.0-alpha.1",
+    "cookie-parser": "1.4.3",
     "ejs": "^2.4.2",
     "express": "^4.14.0",
+    "express-session": "1.14.0",
     "firebase": "3.2.0",
     "gcloud": "^0.37",
     "gm": "^1.22.0",
@@ -29,6 +30,11 @@
     "prompt": "^1.0.0",
     "crypto": "^0.0.3",
     "multer": "^1.1.0",
-    "unirest": "^0.5.0"
+    "unirest": "^0.5.0",
+    "passport": "0.3.2",
+    "passport-google-oauth2": "^0.1.6",
+    "connect-redis": "^3.1.0",
+    "util": "^0.10.3",
+    "tough-cookie": "^2.3.1"
   }
 }

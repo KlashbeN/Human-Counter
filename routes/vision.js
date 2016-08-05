@@ -44,7 +44,8 @@ var db = firebase.database(),
     testRef = db.ref(DBNAME + "Monday July 4, 2016 " + "/09:57");
 
 //var image = 'demo2.jpg';
-var numOfCounters = 1;
+var numOfCounters = 1,
+    waitingTime = 5;
 moment.tz.setDefault('Asia/Singapore');
 
 //-------------------------Firebase Functions----------------------------//
@@ -97,7 +98,8 @@ function readAllData(dates) {
                                 numOfPeople: snapshot.val().numOfPeople,
                                 numOfCounters: snapshot.val().numOfCounters,
                                 url: snapshot.val().imageURL,
-                                time: moment(timeStamp, "HH:mm").format('LT')
+                                time: moment(timeStamp, "HH:mm").format('LT'),
+                                date: date
                             });
                             //console.log(images.length);
                             //callback(); WAS SUPPOSE TO BE HERE
@@ -306,7 +308,11 @@ function getNumberOfPeople() {
 }
 
 function getAvgNum(numOfPeople, counter) {
+  if(numOfPeople != null) {
     return numOfPeople / counter;
+  } else {
+    return 0;
+  }
 }
 
 function getPublicUrl(filename) {
@@ -321,6 +327,9 @@ function getStorageUri(filename) {
         '/' + filename;
 }
 
+function getWaitingTime(avgPax) {
+  return avgPax*waitingTime;
+}
 //NOTE: Working loop for continuous input from the user.
 
 function humanCounter() {
@@ -465,7 +474,8 @@ module.exports = {
                   numOfCounters: numOfCounters,
                   name: image.cloudStorageObject,
                   url: getPublicUrl(image.cloudStorageObject),
-                  time: moment().format('LT')
+                  time: moment().format('LT'),
+                  waitingTime: getWaitingTime(getAvgNum(numOfPeople,numOfCounters))
                 };
                 resolve(imageData);
               })

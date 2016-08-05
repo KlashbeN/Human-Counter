@@ -25,7 +25,9 @@ var routes = function(vision) {
     router.get('/', function(req, res) {
         vision.getImageData().then(function(images) {
             res.render('index', {
-                images: images
+                images: images,
+                user: req.user,
+                date: ""
             });
         });
     });
@@ -35,7 +37,8 @@ var routes = function(vision) {
         vision.updateCounters(req.body.numOfCounter).then(function() {
         vision.getImageData().then(function(images) {
             res.render('index', {
-                images: images
+                images: images,
+                user: req.user
             });
           });
         });
@@ -44,7 +47,8 @@ var routes = function(vision) {
     router.post('/upload', uploadImg.single('img'),vision.uploadToBucket,function(req, res) {
           return vision.visionProcess(req.file).then(function(images) {
                 res.render('result', {
-                    images: images
+                    images: images,
+                    user: req.user
                 });
             });
     });
@@ -54,7 +58,8 @@ var routes = function(vision) {
         vision.viewSpecificDate(req.body.date).then(function(images) {
             res.render('results', {
                 images: images,
-                date: vision.formatDate(req.body.date)
+                date: vision.formatDate(req.body.date),
+                user: req.user
             });
         });
     });
