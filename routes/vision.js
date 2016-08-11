@@ -53,21 +53,21 @@ moment.tz.setDefault('Asia/Singapore');
 //Write image data
 function writeImageData(numOfPeople, numOfCounters, imageName, imageURL) {
     return new Promise(function(resolve) {
-            var imageData = {
-                numOfPeople: numOfPeople,
-                numOfCounters: numOfCounters,
-                imageName: imageName,
-                imageURL: imageURL
-            };
+        var imageData = {
+            numOfPeople: numOfPeople,
+            numOfCounters: numOfCounters,
+            imageName: imageName,
+            imageURL: imageURL
+        };
 
-            var time = getTime();
+        var time = getTime();
 
-            var updates = {};
-            updates[dateConcat(getDate(), time)] = imageData; // Creates new branch called imageData
-            dbRef.update(updates);
-            resolve();
-            //  resolve(dbRef.update(updates));
-        })
+        var updates = {};
+        updates[dateConcat(getDate(), time)] = imageData; // Creates new branch called imageData
+        dbRef.update(updates);
+        resolve();
+        //  resolve(dbRef.update(updates));
+    })
 }
 
 function readAllData(dates) {
@@ -206,7 +206,7 @@ function getTimeRef(date) {
     });
 }
 
-function initDates() {
+/*function initDates() {
     return new Promise(function(resolve, reject) {
         var dates = []; // MAKE THE DATE EMPTY FIRST. TRY IT.
         dbRef.on("value", function(snapshot) {
@@ -216,6 +216,24 @@ function initDates() {
             }
             resolve(dates);
         });
+    });
+} */
+
+function initDates() {
+    return new Promise(function(resolve, reject) {
+        var dates = []; // MAKE THE DATE EMPTY FIRST. TRY IT.
+        dbRef.on("value", function(snapshot) {
+            var info = snapshot.val();
+            for (var key in info) {
+                dates.push(key);
+            }
+            dates.sort(function(a, b) {
+              var firstDate = moment(a,'dddd MMMM D, YYYY').format('X'),
+                  secondDate = moment(b,'dddd MMMM D, YYYY').format('X');
+                return secondDate - firstDate;
+            })
+            resolve(dates);
+        })
     });
 }
 
@@ -290,7 +308,6 @@ function getStorageUri(filename) {
 function getWaitingTime(avgPax) {
     return avgPax * waitingTime;
 }
-//NOTE: Working loop for continuous input from the user.
 
 function humanCounter() {
     promptUser().then(function(res) {
@@ -355,15 +372,6 @@ module.exports = {
         })
     },
 
-    uploadImage1: function(image) {
-        return new Promise(function(resolve) {
-            console.log("I am trying to upload");
-            uploadImage(image).then(function() {
-                resolve();
-            })
-        })
-    },
-
     writeData: function(numOfPeople, imageName, imageUrl) {
         return new Promise(function(resolve) {
             writeImageData(numOfPeople, imageName, imageUrl).then(function() {
@@ -403,7 +411,7 @@ module.exports = {
             next();
         }
 
-        var gcsname = moment() + req.file.originalname;
+        var gcsname = moment().format('HH:mm') + req.file.originalname;
         var file = bucket.file(gcsname);
         var stream = file.createWriteStream();
 
@@ -440,16 +448,6 @@ module.exports = {
                 resolve(imageData);
             })
         })
-    },
-
-    getChildAdded: function() {
-        return new Promise(function(resolve) {
-            dbRef.on("child_added", function(snapshot, prevChildKey) {
-                var newPost = snapshot.val();
-                console.log("Author: " + newPost.numOfPeople);
-                console.log("Title: " + newPost.numOfPeople);
-            });
-        });
     },
 
     updateCounters: function(number) {
