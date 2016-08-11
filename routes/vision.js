@@ -60,27 +60,15 @@ function writeImageData(numOfPeople, numOfCounters, imageName, imageURL) {
                 imageURL: imageURL
             };
 
-            //Update the database with the image data
-            /*var day = getDay(),
-                date = getDate(), */
             var time = getTime();
 
             var updates = {};
-            //  updates[dateConcat(day, date, time)] = imageData; // Creates new branch called imageDatas
-            updates[dateConcat(getDate(), time)] = imageData;
+            updates[dateConcat(getDate(), time)] = imageData; // Creates new branch called imageData
             dbRef.update(updates);
             resolve();
             //  resolve(dbRef.update(updates));
         })
-        //return dbRef.update(updates);
 }
-
-
-// TODO: Promise initDates first and initTime, next figure out how to loop through both.
-// TODO: Figure out how to get the time first for each date before obtaining the data!!
-// TODO: Figure out how to transfer the data out!
-// TODO: Add promise to this function, maybe we  can try for loop with a function inside the for loop?
-// NOTE: DONE syncing
 
 function readAllData(dates) {
     return new Promise(function(resolve, reject) {
@@ -102,7 +90,7 @@ function readAllData(dates) {
                                 date: date
                             });
                             //console.log(images.length);
-                            //callback(); WAS SUPPOSE TO BE HERE
+                            //callback(); Was SUPPOSE TO BE HERE
                         })
                     })
                 }, function(err) {
@@ -139,7 +127,6 @@ function readData(date) {
                         });
                         //  console.log(images.length);
                         callback();
-                        //callback(); WAS SUPPOSE TO BE HERE
                     })
                 })
             }, function(err) {
@@ -171,14 +158,6 @@ function displayAllData() {
 
 
 //-------------------------Google Cloud Functions----------------------------//
-
-
-/*function countPeople(image, callback) {
-    vision.detectFaces(image, function(error, faces) {
-        if (error) throw error;
-        callback(faces);
-    });
-} */
 
 function countPeople(image, callback) {
     return new Promise(function(resolve, reject) {
@@ -227,10 +206,6 @@ function getTimeRef(date) {
     });
 }
 
-
-// TODO: Utilize this to get all of the data
-// TODO: MAKE DATE EMPTY!
-
 function initDates() {
     return new Promise(function(resolve, reject) {
         var dates = []; // MAKE THE DATE EMPTY FIRST. TRY IT.
@@ -266,25 +241,10 @@ function promptUser() {
 
 
 // -------- Moment Functions ---------- //
-/*function getDayDate() {
-    return getDay() + ' ' + getDate();
-}
-
-function getDate() {
-    return moment().format('LL');
-}
-
-function getDay() {
-    return moment().format('dddd');
-} */
 
 function getTime() {
     return moment().format("HH:mm");
 }
-
-/*function dateConcat(day, date, time) {
-    return day + ' ' + date + ' /' + time;
-} */
 
 function dateConcat(date, time) {
     return date + '/' + time;
@@ -308,11 +268,11 @@ function getNumberOfPeople() {
 }
 
 function getAvgNum(numOfPeople, counter) {
-  if(numOfPeople != null) {
-    return numOfPeople / counter;
-  } else {
-    return 0;
-  }
+    if (numOfPeople != null) {
+        return numOfPeople / counter;
+    } else {
+        return 0;
+    }
 }
 
 function getPublicUrl(filename) {
@@ -328,7 +288,7 @@ function getStorageUri(filename) {
 }
 
 function getWaitingTime(avgPax) {
-  return avgPax*waitingTime;
+    return avgPax * waitingTime;
 }
 //NOTE: Working loop for continuous input from the user.
 
@@ -463,24 +423,24 @@ module.exports = {
 
     },
 
-  visionProcess: function(image) {
+    visionProcess: function(image) {
         return new Promise(function(resolve) {
             countPeople(image.cloudStoragePublicUrl, function(faces) {
                 var numOfPeople = faces.length;
                 console.log('Found ' + numOfPeople + ' face');
                 writeImageData(getAvgNum(numOfPeople, numOfCounters), numOfCounters, image.cloudStorageObject, getPublicUrl(image.cloudStorageObject))
                 var imageData = {
-                  numOfPeople: getAvgNum(numOfPeople, numOfCounters),
-                  numOfCounters: numOfCounters,
-                  name: image.cloudStorageObject,
-                  url: getPublicUrl(image.cloudStorageObject),
-                  time: moment().format('LT'),
-                  waitingTime: getWaitingTime(getAvgNum(numOfPeople,numOfCounters))
+                    numOfPeople: getAvgNum(numOfPeople, numOfCounters),
+                    numOfCounters: numOfCounters,
+                    name: image.cloudStorageObject,
+                    url: getPublicUrl(image.cloudStorageObject),
+                    time: moment().format('LT'),
+                    waitingTime: getWaitingTime(getAvgNum(numOfPeople, numOfCounters))
                 };
                 resolve(imageData);
-              })
             })
-},
+        })
+    },
 
     getChildAdded: function() {
         return new Promise(function(resolve) {
@@ -492,11 +452,15 @@ module.exports = {
         });
     },
 
-    updateCounters: function( number) {
-      return new Promise(function(resolve) {
-      numOfCounters = number;
-      resolve();
-    });
+    updateCounters: function(number) {
+        return new Promise(function(resolve) {
+            numOfCounters = number;
+            resolve();
+        });
+    },
+
+    getListOfDates: function() {
+        return initDates();
     }
 
     /*  visionProcess: function(cloudStorageUri, callback) {

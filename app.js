@@ -45,7 +45,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:8080/auth/google/callback",
+        callbackURL: "http://vision-recognition-1338.appspot.com/auth/google/callback",
         passReqToCallback: true
     },
     function(request, accessToken, refreshToken, profile, done) {
@@ -73,19 +73,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-/*
-app.use(session({
-  secret: config.secret,
-  signed: true
-}));
 
-
-var oauth2 = require('./routes/oauth2')(config.oauth2);
-app.use(oauth2.router);
-app.use(oauth2.aware);
-app.use(oauth2.template);
-
-*/
 // Configure routes
 
 app.use('/', require('./routes/routes')(
@@ -118,6 +106,7 @@ app.get('/logout', function(req, res) {
 app.get('/account', ensureAuthenticated, function(req,res){
   res.render('account', { user: req.user});
 });
+
 
 // Basic 404 handler
 app.use(function(req, res) {

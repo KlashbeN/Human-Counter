@@ -54,7 +54,6 @@ var routes = function(vision) {
     });
 
     router.post('/results', function(req, res) {
-      console.log(req.body.date);
         vision.viewSpecificDate(req.body.date).then(function(images) {
             res.render('results', {
                 images: images,
