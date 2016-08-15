@@ -43,10 +43,13 @@ var db = firebase.database(),
     dbRef = db.ref(DBNAME),
     testRef = db.ref(DBNAME + "Monday July 4, 2016 " + "/09:57");
 
-//var image = 'demo2.jpg';
 var numOfCounters = 1,
     waitingTime = 5;
 moment.tz.setDefault('Asia/Singapore');
+
+var options = {
+  maxResults: 100
+};
 
 //-------------------------Firebase Functions----------------------------//
 
@@ -66,7 +69,6 @@ function writeImageData(numOfPeople, numOfCounters, imageName, imageURL) {
         updates[dateConcat(getDate(), time)] = imageData; // Creates new branch called imageData
         dbRef.update(updates);
         resolve();
-        //  resolve(dbRef.update(updates));
     })
 }
 
@@ -90,7 +92,6 @@ function readAllData(dates) {
                                 date: date
                             });
                             //console.log(images.length);
-                            //callback(); Was SUPPOSE TO BE HERE
                         })
                     })
                 }, function(err) {
@@ -100,8 +101,7 @@ function readAllData(dates) {
             })
         }, function(err) {
             //console.log("Finish iterating!");
-            callback(); // temporary here for testing. wasnt here before
-            //  resolve(images); // WAS HERE
+            callback();
         })
         resolve(images);
     });
@@ -161,7 +161,7 @@ function displayAllData() {
 
 function countPeople(image, callback) {
     return new Promise(function(resolve, reject) {
-        vision.detectFaces(image, function(error, faces) {
+        vision.detectFaces(image, options, function(error, faces) {
             if (error) throw error;
             callback(faces);
             resolve();
@@ -189,9 +189,6 @@ function retrieveImage() {
 
 //---------------------------Miscelleneous------------------------------//
 
-
-// TODO: Figure out how to utilize all of the timing of all dates
-
 function getTimeRef(date) {
     return new Promise(function(resolve, reject) {
         var timeRefs = [];
@@ -206,22 +203,9 @@ function getTimeRef(date) {
     });
 }
 
-/*function initDates() {
-    return new Promise(function(resolve, reject) {
-        var dates = []; // MAKE THE DATE EMPTY FIRST. TRY IT.
-        dbRef.on("value", function(snapshot) {
-            var info = snapshot.val();
-            for (var key in info) {
-                dates.push(key);
-            }
-            resolve(dates);
-        });
-    });
-} */
-
 function initDates() {
     return new Promise(function(resolve, reject) {
-        var dates = []; // MAKE THE DATE EMPTY FIRST. TRY IT.
+        var dates = [];
         dbRef.on("value", function(snapshot) {
             var info = snapshot.val();
             for (var key in info) {
@@ -319,39 +303,14 @@ function humanCounter() {
                     resolve(res);
                 })
             })
-        }).then(function(res) {
-            uploadImage(res)
         }).then(function() {
-            readData("Thursday July 28, 2016")
-                .then(function() {
-                    humanCounter();
-                })
-        })
-        /*  .then(function() {
               initDates().then(function(dates) {
                   return readAllData(dates)
               }).then(function() {
                   humanCounter();
               })
-          }) */
+          })
 }
-// TODO: Prompt then process the image. Loop the process non stop.
-
-
-/*function main(image) {
-    countPeople(image, function(faces){
-    	var numOfPeople = faces.length;
-    	console.log('Found ' + numOfPeople + ' face');
-    	//writeImageData(numOfPeople,image,getPublicUrl(image));
-    });
-    //uploadImage(image);
-    initDates().then(function() {
-        return readAllData()
-    }).then(function(res) {
-        getImages(res)
-    });
-} */
-
 
 function main() {
     humanCounter();
@@ -461,36 +420,6 @@ module.exports = {
         return initDates();
     }
 
-    /*  visionProcess: function(cloudStorageUri, callback) {
-          return new Promise(function(resolve) {
-            console.log(cloudStorageUri);
-              var body = {
-                  "requests": [{
-                      "image": {
-                          "source": {
-                              "gcsImageUri": cloudStorageUri,
-                          }
-                      },
-                      "features": [{
-                          "type": "FACE_DETECTION",
-                          "maxResults": 1
-                      }]
-                  }]
-              }
-
-              console.log("DONE");
-              unirest.post(GOOGLE_VISION_API_URL)
-                  .header({
-                      'Content-Type': 'application/json'
-                  })
-                  .send(body)
-                  .end(function(response) {
-                      console.log(JSON.stringify(response.body.responses));
-                      writeImageData(JSON.stringify(response.body.responses),0,0,0);
-                  });
-              resolve();
-          });
-      } */
 }
 if (module == require.main) {
     var photo = process.argv[2];

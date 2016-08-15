@@ -32,7 +32,7 @@ var routes = function(vision) {
         });
     });
 
-    router.post('/update/counter', function(req, res) { 
+    router.post('/update/counter', function(req, res) {
         vision.updateCounters(req.body.numOfCounter).then(function() {
         vision.getImageData().then(function(images) {
             res.render('index', {
